@@ -1,0 +1,5 @@
+/system-property=at.itbh.bev.index.location:add(value="<PATH COMES HERE>")
+/system-property=at.itbh.bev.csv.location:add(value="<PATH COMES HERE>")
+/system-property=at.itbh.bev.results.max:add(value="10")
+/system-property=at.itbh.bev.results.prune:add(value="true")
+/system-property=hibernate.search.default.indexBase:add(value="<PATH COMES HERE>")

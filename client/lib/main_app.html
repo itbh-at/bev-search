@@ -1,0 +1,251 @@
+<!--
+     Copyright (c) 2016, DI Christoph D. Hermann (ITBH). All rights reserved. Use of this source code
+     is governed by a BSD-style license that can be found in the LICENSE file.
+   -->
+
+<dom-module id="main-app">
+    <style>
+     :host {
+	 display: block;
+     }
+
+     .content {
+	 padding: 4px;
+     }
+
+     .plz {
+	 max-width: 100px;
+     }
+
+     .field {
+	 min-width: 100px;
+     }
+
+     .houseId {
+	 width: 300px;
+     }
+     
+     .hgroup {
+	 @apply(--layout-horizontal);
+	 @apply(--layout-wrap);
+     }
+
+     .vgroup {
+	 @apply(--layout-vertical);
+     }
+
+     .flex {
+	 @apply(--layout-flex);
+     }
+
+     .info-field {
+	 min-width: 200px;
+	 padding: 8px;
+     }
+
+     .icon-field {
+	 width: 24px;
+	 padding: 8px;
+     }
+
+     .address-field {
+	 min-width: 400px;
+	 padding: 8px;
+     }
+
+     .address-detail-toggle {
+	 cursor: pointer; 
+     }
+
+     .show-on-map {
+	 cursor: pointer;
+	 color: #333;
+     }
+
+     .caption {
+	 font-weight: bold;
+     }
+
+     .underline-dotted {
+	 border-bottom: 1px dotted;
+     }
+     
+     paper-input {
+	 padding: 8px;
+     }
+
+     .hidden {
+	 visibility: hidden;
+     }
+     .result-item {
+	 margin-bottom: 16px;
+	 border-bottom: 1px solid #E5E4E2;
+     }
+    </style>
+
+    <template>
+
+	<iron-ajax
+	    id="ajaxGeocode"
+	    url="{{restUrl}}"
+	    params="{{restParams}}"
+	    handle-as="json"
+	    on-response="handleGeocodeResponse"
+	    on-error="handleGeocodeError"
+	    debounce-duration="300"></iron-ajax>
+
+	<iron-ajax
+	    id="ajaxReverseGeocode"
+	    url="{{restUrlReverse}}"
+	    handle-as="json"
+	    on-response="handleGeocodeResponse"
+	    on-error="handleGeocodeError"
+	    debounce-duration="300"></iron-ajax>
+
+	<paper-toast id="errorToast" duration="5000">
+	    <iron-icon icon="error"></iron-icon>&nbsp;ERROR:&nbsp;<span>[[lastError]]</span>
+	</paper-toast>
+
+	<paper-dialog id="mapDialog" modal style="width: 90%; height: 90%">
+	    <div class="buttons">
+		<paper-icon-button icon="close" dialog-confirm autofocus>Schließen</paper-icon-button>
+	    </div>
+	    <iframe style="width: 93%; height: 85%"
+		    src$="map.html?latitude=[[selectedLatitude]]&longitude=[[selectedLongitude]]&description=[[selectedAddress]]&width=100%25&height=100%25"
+		    frameborder="0" marginwidth="0" marginheight="0" 
+		    scrolling="no">
+	    </iframe>
+	</paper-dialog>
+
+	<section id="addressSearch" class="content">
+	    <h1>Adresssuche auf Daten des Bundesamtes für Eich- und Vermessungswesen</h1>
+	    <div>Unabhängig von den Feldern für geographische Länge und Breite muss mindestens ein Feld für eine Suche befüllt sein.</div>
+	    <form on-submit="onSubmitSearchForm">
+		<div class="hgroup">
+		    <paper-input label="PLZ" value="{{postalCode}}" maxlength="4" minlength="4" class="field plz"></paper-input>
+		    <paper-input label="Ort" value="{{place}}" minlength="2" class="field flex"></paper-input>
+		</div>
+		<div class="hgroup">
+		    <paper-input label="Straße, Gebäude-, Hofname" value="{{addressLine}}" minlength="2" class="field flex"></paper-input>
+		    <paper-input label="Hnr., Hnr./Stiege, Bezeichnung" value="{{houseId}}" class="field houseId"></paper-input>
+		</div>
+		<div class="hgroup">
+		    <paper-input label="Geogr. Länge (Y)" value="{{latitude}}" class="field"></paper-input>
+		    <paper-input label="Geogr. Breite (X)" value="{{longitude}}" class="field"></paper-input>
+		    <paper-input label="Radius (km)" value="{{radius}}" class="field"></paper-input>
+		    <div class="flex"></div>
+		    <paper-item><paper-button on-tap="search"><iron-icon id="search-button-icon" icon="search"></iron-icon>Suchen</paper-button></paper-item>
+		    <input hidden="true" type="submit" />
+		</div>
+	    </form>
+	</section>
+
+
+	<!-- RESULT SECTION -->
+	
+	<section id="searchResults" class="content">
+	    <div class="flex result-item hgroup">
+		<div class="flex"></div>
+		<iron-icon id="loading-indicator" icon="refresh" style="height: 56px;" class="hidden"></iron-icon>
+		<div class="flex"></div>
+	    </div>
+	    <!-- <iron-list id="resultList" items="[[resultList]]" as="result"> -->
+	    <template is="dom-repeat" items="[[resultList]]" as="result">
+		<div id="item-[[index]]" class="result-item flex">
+		    <div class="vgroup content">
+			<div class="hgroup">
+			    <div class="hgroup">
+				<div class="info-field">
+				    <span class="caption">Score:</span> [[result.score]]
+				</div>
+			    </div>
+			    <div class="hgroup">
+				<div class="address-field">
+					<span class="underline-dotted">[[result.address.postalCode]]</span>&nbsp;
+					<span class="underline-dotted">[[result.address.place]]</span>&nbsp;
+					<span class="underline-dotted">[[result.address.street]]</span>&nbsp;
+					<span class="underline-dotted">[[result.address.houseNumber]]</span>&nbsp;
+					<span class="underline-dotted">[[result.address.houseNumberAddition]]</span>&nbsp;
+					<span class="underline-dotted">[[result.address.buildingId]]</span>&nbsp;
+				</div>
+				<div class="icon-field">
+				    <!-- <a target="maps" href="https://www.openstreetmap.org?mlat=[[result.address.latitude]]&mlon=[[result.address.longitude]]#map=17/[[result.address.latitude]]/[[result.address.longitude]]">
+					 <iron-icon icon="maps:place"
+					 id="icon-collapse-[[index]]"
+					 class="show-on-map">
+					 </iron-icon>
+					 </a> -->
+				    <iron-icon icon="maps:place"
+					 id="icon-show-map-[[index]]"
+					       class="show-on-map"
+					       data-latitude$="[[result.address.latitude]]"
+					       data-longitude$="[[result.address.longitude]]"
+					       data-address$="[[result.address.postalCode]] [[result.address.place]] [[result.address.street]] [[result.address.houseNumber]] [[result.address.houseNumberAddition]] [[result.address.buildingId]]"
+					       on-tap="showMapDialog">
+				    </iron-icon>
+				</div>
+				<div class="icon-field">
+				    <iron-icon icon="arrow-drop-down" id="icon-collapse-[[index]]" class="address-detail-toggle" on-tap="toggleResultDetail" data-collapse-id$="collapse-[[index]]" data-item-id$="item-[[index]]"></iron-icon>
+				</div>
+			    </div>
+			</div>
+			<iron-collapse id="collapse-[[index]]" class="hgroup hidden"  style="padding-top: 8px;">
+			    <div class="vgroup">
+				<div class="hgroup">
+				    <div class="hgroup">
+					<div class="info-field">
+					    <span class="caption">Gemeinde:</span> [[result.address.municipality]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">Adressname:</span> [[result.address.addressName]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">Gebäudename:</span> [[result.address.buildingName]]
+					</div>
+				    </div>
+				    <div class="hgroup">
+					<div class="info-field">
+					    <span class="caption">Länge:</span> [[result.address.latitude]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">Breite:</span> [[result.address.longitude]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">Distanz:</span> [[result.distance]]
+					</div>
+				    </div>
+				    <div class="hgroup">
+					<div class="info-field">
+					    <span class="caption">ID:</span> [[result.address.id]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">ADRCD:</span> [[result.address.adrcd]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">SUBCD:</span> [[result.address.subcd]]
+					</div>
+				    </div>
+				    <div class="hgroup">
+					<div class="info-field">
+					    <span class="caption">GKZ:</span> [[result.address.gkz]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">OKZ:</span> [[result.address.okz]]
+					</div>
+					<div class="info-field">
+					    <span class="caption">SKZ:</span> [[result.address.skz]]
+					</div>
+				    </div>
+				</div>
+			    </div>
+			</iron-collapse>
+		    </div>
+		</div>
+	    </template>
+	</section>
+	<div style="position: fixed; bottom:0; right:0; padding: 8px; font-size: 0.6em; color: gray">
+	    <a style="color: gray" href="http://www.bev.gv.at/portal/page?_pageid=713,1604469&_dad=portal&_schema=PORTAL">© Österreichisches Adressregister (Daten)</a>,
+	    <a style="color: gray" href="http://www.itbh.at/">© DI Christoph D. Hermann (Programmierung)</a>
+	</div>
+    </template>
+</dom-module>

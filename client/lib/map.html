@@ -1,0 +1,49 @@
+<html>
+    <head>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+	<style>
+	 #map {
+	     width: 400px;
+	     min-height: 150px;
+	 }
+	</style>
+    </head>
+    <body>
+	<div id="map"></div>
+	<script>
+
+	 function getUrlVars() {
+	     var vars = {};
+	     var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+						      function(m,key,value) {
+							  vars[key] = value;
+						      });
+	     return vars;
+	 }
+
+	 var zoom = getUrlVars()['zoom'];
+	 var latitude = getUrlVars()['latitude'];
+	 var longitude = getUrlVars()['longitude'];
+	 var description = getUrlVars()['description'];
+	 var height = getUrlVars()['height'];
+	 var width = getUrlVars()['width'];
+
+	 if (!zoom)
+	     zoom = 16;
+	 
+	 document.getElementById('map').style.height = decodeURI(height);
+	 document.getElementById('map').style.width = decodeURI(width);
+	 
+	 var map = L.map('map').setView([latitude, longitude], zoom);
+
+	 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+	 }).addTo(map);
+
+	 var marker = L.marker([latitude, longitude]).addTo(map);
+	 if (description != null)
+	     marker.bindPopup(decodeURI(description)).openPopup();
+	</script>
+    </body>
+</html>

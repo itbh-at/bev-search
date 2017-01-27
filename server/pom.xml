@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+    DI Christoph D. Hermann, ITBH <christoph.hermann@itbh.at> 
+    Copyright 2016, DI Christoph Hermann and/or its affiliates, and individual 
+    contributors by the @authors tag. See the copyright.txt in the distribution 
+    for a full listing of individual contributors. 
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>at.itbh.bev</groupId>
+    <artifactId>bev-search</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>BEV data search</name>
+    <description>Search address data from the Austrian Bundesamt für
+    Eich- und Vermessungswesen</description>
+    <url>http://www.itbh.at/</url>
+
+    <!-- <licenses> -->
+    <!--     <license> -->
+    <!--         <name>Apache License, Version 2.0</name> -->
+    <!--         <distribution>repo</distribution> -->
+    <!--         <url>http://www.apache.org/licenses/LICENSE-2.0.html</url> -->
+    <!--     </license> -->
+    <!-- </licenses> -->
+
+    <properties>
+        <!-- Explicitly declaring the source encoding eliminates the following
+            message: -->
+        <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered
+            resources, i.e. build is platform dependent! -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+
+        <version.jboss.spec.javaee.7.0>1.0.3.Final</version.jboss.spec.javaee.7.0>
+
+        <!-- other plug-in versions -->
+        <version.war.plugin>2.1.1</version.war.plugin>
+        <version.ejb.plugin>2.3</version.ejb.plugin>
+
+        <!-- maven-compiler-plugin -->
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+    </properties>
+
+    <!-- Define the three submodules this application consists of -->
+    <modules>
+        <module>bev-search-api</module>
+        <module>bev-search-core</module>
+	<module>bev-search-rest</module>
+	<module>bev-search-rest-client</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Define the version of JBoss' Java EE 7 APIs we want to import.
+                Any dependencies from org.jboss.spec will have their version defined by this
+                BOM -->
+            <!-- JBoss distributes a complete set of Java EE 7 APIs including
+                a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or
+                a collection) of artifacts. We use this here so that we always get the correct
+                versions of artifacts. Here we use the jboss-javaee-7.0 stack (you can read
+                this as the JBoss stack of the Java EE 7 APIs). You can actually use this
+                stack with any version of WildFly that implements Java EE 7, not just JBoss
+                WildFly 10! -->
+            <dependency>
+                <groupId>org.jboss.spec</groupId>
+                <artifactId>jboss-javaee-7.0</artifactId>
+                <version>${version.jboss.spec.javaee.7.0}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Define the version of the shared API jar, so that we can
+                reference it in both bev-search-api easily -->
+            <dependency>
+                <groupId>at.itbh.bev</groupId>
+                <artifactId>bev-search-api</artifactId>
+                <version>${project.version}</version>
+                <type>ejb</type>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+    <build>
+        <!-- Set the name of the WAR, used as the context root when the app
+            is deployed -->
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <!-- Disable WildFly plug-in, as nothing to deploy -->
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${version.wildfly.maven.plugin}</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

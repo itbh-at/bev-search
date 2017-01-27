@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+        <groupId>at.itbh.bev</groupId>
+        <artifactId>bev-search</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+	
+	<artifactId>bev-search-api</artifactId>
+	<packaging>ejb</packaging>
+	<name>Public BEV data search API</name>
+	
+	<dependencies>
+
+		<!-- Define the version of JBoss' Java EE 7 APIs we want to import. Any 
+			dependencies from org.jboss.spec will have their version defined by this 
+			BOM -->
+		<!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill 
+			of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+			of artifacts. We use this here so that we always get the correct versions 
+			of artifacts. Here we use the jboss-javaee-7.0 stack (you can read this as 
+			the JBoss stack of the Java EE 7 APIs). You can actually use this stack with 
+			any version of WildFly that implements Java EE 7, not just JBoss WildFly 
+			10! -->
+		<dependency>
+			<groupId>org.jboss.spec</groupId>
+			<artifactId>jboss-javaee-7.0</artifactId>
+			<version>${version.jboss.spec.javaee.7.0}</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<!-- Set the name of the deployment -->
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<!-- This jar is deployed to WildFly as a JBoss Module, which we can depend 
+				on from other deployments -->
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${version.wildfly.maven.plugin}</version>
+				<configuration>
+					<skip>false</skip>
+					<filename>${project.build.finalName}.jar</filename>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ejb-plugin</artifactId>
+				<version>${version.ejb.plugin}</version>
+				<configuration>
+					<ejbVersion>3.1</ejbVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
