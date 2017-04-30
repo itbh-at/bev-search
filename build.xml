@@ -1,0 +1,93 @@
+<!--
+build.xml - Main build file
+Copyright (C) 2017 Christoph D. Hermann <christoph.hermann@itbh.at>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<project name="bev-search">
+  <!--
+      Running Maven from Ant inspired by
+      http://stackoverflow.com/a/40596016/6114176
+  -->
+
+  <condition property="isWindows">
+    <os family="windows" />
+  </condition>
+
+  <condition property="isUnix">
+    <os family="unix" />
+  </condition>
+
+  <target name="shell_windows_setup" if="isWindows">
+    <property name="shell.executable" value="cmd" />
+    <property name="shell.args" value="/c" />
+  </target>
+
+  <target name="shell_unix_setup" if="isUnix">
+    <property name="shell.executable" value="sh" />
+    <property name="shell.args" value="-c" />
+  </target>
+
+  <target name="run-mvn-goals" depends="shell_windows_setup, shell_unix_setup">
+    <exec dir="${p_basedir}" executable="${shell.executable}" failonerror="true">
+      <arg line="${shell.args} 'mvn ${p_goals}'" />
+    </exec>
+  </target>
+
+  <target name="run-pub" depends="shell_windows_setup, shell_unix_setup">
+    <exec dir="${p_basedir}" executable="${shell.executable}" failonerror="true">
+      <arg line="${shell.args} 'pub get'" />
+    </exec>
+    <exec dir="${p_basedir}" executable="${shell.executable}" failonerror="true">
+      <arg line="${shell.args} 'pub build'" />
+    </exec>
+  </target>
+
+  <target name="build-server" depends="build-web-polymer-client">
+    <antcall target="run-mvn-goals">
+      <param name="p_basedir" value="server" />
+      <param name="p_goals" value="clean package" />
+    </antcall>
+  </target>
+
+  <target name="build-cmd-java-client">
+    <antcall target="run-mvn-goals">
+      <param name="p_basedir" value="client${file.separator}cmd${file.separator}bev-search-java-client" />
+      <param name="p_goals" value="clean package" />
+    </antcall>
+  </target>
+
+  <target name="build-web-polymer-client">
+    <antcall target="run-pub">
+      <param name="p_basedir" value="client${file.separator}web${file.separator}polymer_dart" />
+    </antcall>
+    <copydir src="client${file.separator}web${file.separator}polymer_dart${file.separator}build${file.separator}web${file.separator}"
+             dest="server${file.separator}bev-search-ui${file.separator}src${file.separator}main${file.separator}webapp${file.separator}"
+             />
+  </target>
+
+  <target name="build-web-angular-client">
+    <antcall target="run-pub">
+      <param name="p_basedir" value="client${file.separator}web${file.separator}angular_dart" />
+    </antcall>
+  </target>
+
+  <target name="build">
+    <antcall target="build-cmd-java-client" />
+    <!--
+        Build the server and package the web UI into it.
+    -->
+    <antcall target="build-server" />
+  </target>
+</project>

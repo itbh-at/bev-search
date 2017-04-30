@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+pom.xml - Build file for the web UI container of the BEV search system
+
+Copyright (C) 2017 Christoph D. Hermann <christoph.hermann@itbh.at>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>at.itbh.bev</groupId>
+    <artifactId>bev-search-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>bev-search-ui</artifactId>
+  <packaging>war</packaging>
+  <name>bev-search-ui</name>
+  <description>Web UI for the bev-search.</description>
+  <url>https://github.com/itbh-at/bev-search</url>
+
+  <organization>
+    <name>ITBH - DI Christoph Hermann</name>
+    <url>http://www.itbh.at/</url>
+  </organization>
+
+    <developers>
+    <developer>
+      <id>cdh</id>
+      <name>Christoph D. Hermann</name>
+      <email>christoph.hermann@itbh.at</email>
+      <organization>ITBH - DI Christoph Hermann</organization>
+      <organizationUrl>http://www.itbh.at/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Vienna</timezone>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>GNU Affero General Public License, Version 3.0</name>
+      <distribution>manual</distribution>
+      <url>http://www.gnu.org/licenses/agpl-3.0.en.html</url>
+    </license>
+  </licenses>
+
+  <dependencies>
+    <!--
+        No dependencies.
+
+        This project is just an empty container for the web
+        application.
+    -->
+  </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${version.war.plugin}</version>
+        <configuration>
+          <!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+      <!-- The JBoss AS plugin deploys your war to a local JBoss AS container -->
+      <!-- To use, run: mvn package jboss-as:deploy -->
+      <plugin>
+        <groupId>org.jboss.as.plugins</groupId>
+        <artifactId>jboss-as-maven-plugin</artifactId>
+        <version>${version.wildfly.maven.plugin}</version>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

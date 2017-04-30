@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+pom.xml - Build file for the ReST client of the BEV search system
+
+Copyright (C) 2017 Christoph D. Hermann <christoph.hermann@itbh.at>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>bev-search-java-client</artifactId>
+  <groupId>at.itbh.bev</groupId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>bev-search-java-client</name>
+  <description>Command line ReST client for the BEV search</description>
+  <url>https://github.com/itbh-at/bev-search</url>
+  
+  <organization>
+    <name>ITBH - DI Christoph Hermann</name>
+    <url>http://www.itbh.at/</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>cdh</id>
+      <name>Christoph D. Hermann</name>
+      <email>christoph.hermann@itbh.at</email>
+      <organization>ITBH - DI Christoph Hermann</organization>
+      <organizationUrl>http://www.itbh.at/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Vienna</timezone>
+    </developer>
+  </developers>
+
+  <properties>
+    <!-- maven-compiler-plugin -->
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <version>3.0.1.Final</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-client</artifactId>
+      <version>3.0.1.Final</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.7.3</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+  	<!--
+  		Build and package into a single jar file containing all dependencies.
+  	 -->
+    <sourceDirectory>src</sourceDirectory>
+    <finalName>BevRestClient</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>at.itbh.bev.rest.client.BevRestClient</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>    
+    </plugins>
+  </build>
+</project>

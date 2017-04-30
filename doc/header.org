@@ -1,0 +1,40 @@
+# -*- mode: org; -*-
+
+#+BEGIN_SRC emacs-lisp :exports results :results silent
+;; Defines the itbh-article LaTex export class
+(add-to-list 'org-latex-classes
+        '("itbh-article"
+           "\\documentclass{scrartcl}"
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           ("\\paragraph{%s}" . "\\paragraph*{%s}")
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+END_SRC
+
+
+#+HTML_DOCTYPE: html5
+#+HTML_HTML5_FANCY: t
+
+#+HTML_STYLE: nil
+
+#+HTML_HEAD: <meta name="theme-color" content="#257E12">
+#+HTML_HEAD: <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+#+HTML_HEAD: <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+#+HTML_HEAD: <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono" type="text/css">
+#+HTML_HEAD: <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/default.min.css" type="text/css">
+#+HTML_HEAD: <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.green-amber.min.css" type="text/css" />
+#+HTML_HEAD: <link rel="stylesheet" href="itbh-org-html-export.css" type="text/css">
+
+#+HTML_HEAD: <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+#+HTML_HEAD: <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+#+HTML_HEAD: <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="itbh-org-html-export.js"></script>
+
+#+LATEX_CLASS: itbh-article
+#+LATEX_CLASS_OPTIONS: [a4paper, DIV16, halfparskip+]
+#+LATEX_HEADER: \usepackage{ltablex}
+#+LATEX_HEADER: \usepackage[ngerman]{babel}
+#+LATEX_HEADER: \linespread{1.2}
+
+#+OPTIONS: ^:nil ':t

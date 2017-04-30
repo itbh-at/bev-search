@@ -1,0 +1,1224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
+<head>
+<!-- 2017-04-28 Fri 23:24 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dokumentation: Client für die BEV-Suche</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="DI Christoph D. Hermann (ITBH) &lt;christoph.hermann@itbh.at&gt;" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/bigblow/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/bigblow/css/bigblow.css"/>
+<link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/bigblow/css/hideshow.css"/>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/bigblow/js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/bigblow/js/jquery-ui-1.10.2.min.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/bigblow/js/jquery.localscroll-min.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/bigblow/js/jquery.scrollTo-1.4.3.1-min.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/bigblow/js/jquery.zclip.min.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/bigblow/js/bigblow.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/bigblow/js/hideshow.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Dokumentation: Client für die BEV-Suche</h1>
+<div id="table-of-contents">
+<h2>Inhaltsverzeichnis</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org82d9f1b">1. Benutzerdokumentation</a>
+<ul>
+<li><a href="#org755fc46">1.1. Web-Oberfläche</a>
+<ul>
+<li><a href="#org7a859e4">1.1.1. Benutzeroberfläche</a></li>
+<li><a href="#org88c16ee">1.1.2. Suche nach ähnlichen Adressen</a></li>
+<li><a href="#org8abc06c">1.1.3. Suche nach Adressen in der Nähe</a></li>
+<li><a href="#orga12dafa">1.1.4. Suchergebnisse</a></li>
+</ul>
+</li>
+<li><a href="#org27cc830">1.2. Kommandozeilenprogramm</a></li>
+<li><a href="#org8267020">1.3. ReST-Schnittstelle</a>
+<ul>
+<li><a href="#org54d5300">1.3.1. Ähnlichkeitssuche mit detaillierter Antwort</a></li>
+<li><a href="#orgb179e22">1.3.2. Ähnlichkeitssuche mit vereinfachter Antwort</a></li>
+<li><a href="#org87fdd1c">1.3.3. Positionssuche mit detaillierter Antwort</a></li>
+<li><a href="#org2cc31d0">1.3.4. Positionssuche mit vereinfachter Antwort</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgc6734b7">2. Technische Dokumentation</a>
+<ul>
+<li><a href="#org7256e98">2.1. Systemarchitektur</a></li>
+<li><a href="#org9e93bc9">2.2. Kompilieren</a>
+<ul>
+<li><a href="#orgf6a5a37">2.2.1. bev_server</a></li>
+<li><a href="#org375fa65">2.2.2. bev_ui</a></li>
+<li><a href="#orgecbc55f">2.2.3. bev_docs</a></li>
+</ul>
+</li>
+<li><a href="#org5d93679">2.3. Installation</a></li>
+<li><a href="#org951e5d3">2.4. Konfiguration</a></li>
+<li><a href="#org9bc0b28">2.5. Datenimport</a></li>
+</ul>
+</li>
+<li><a href="#org7d98877">3. Lizenz</a>
+<ul>
+<li><a href="#org5002ee6">3.1. Daten</a></li>
+<li><a href="#org1e5a3b2">3.2. Applikation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org82d9f1b" class="outline-2">
+<h2 id="org82d9f1b"><span class="section-number-2">1</span> Benutzerdokumentation</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-org755fc46" class="outline-3">
+<h3 id="org755fc46"><span class="section-number-3">1.1</span> Web-Oberfläche</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Diese Web-Applikation ermöglicht das Durchsuchen von Adressdaten des
+Bundesamtes für Eich- und Vermessungswesen über Schnittstellen die
+über einen speziellen Suchdienst<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> zur Verfügung gestellt werden.
+Es können sowohl Adressen die in ihrer Schreibweise einer
+Referenzadresse ähneln als auch Adressen in der Nähe zu bestimmten
+geograpischen Koordinaten gesucht werden.
+</p>
+
+<p>
+Die Web-Applikation ist zur Nutzung auf stationären Arbeitsplätzen
+mit aktuellen Web-Browsern und Desktop-Monitoren ausgelegt. Es
+existiert jedoch eine rudimentäre Unterstützung für kleinere
+Displays wie z.B. Tablets.
+</p>
+</div>
+
+<div id="outline-container-org7a859e4" class="outline-4">
+<h4 id="org7a859e4"><span class="section-number-4">1.1.1</span> Benutzeroberfläche</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+Die Benutzeroberfläche ist je nach Konfiguration unter
+<code>http://&lt;Server&gt;/bev-search-ui/</code> oder
+<code>https://&lt;Server&gt;/bev-search-ui/</code> erreichbar. Die
+Benutzeroberfläche stellt sich beim Aufruf wie in der Abbildung
+<a href="#orgeb82976">1</a> dar.
+</p>
+
+
+<div id="orgeb82976" class="figure">
+<p><img src="./images/main_interface_no_results.png" alt="Benutzeroberlfäche" title="Benutzeroberläche" align="center" width="95%" />
+</p>
+<p><span class="figure-number">Abbildung 1: </span>Benutzeroberfläche allgemein</p>
+</div>
+
+<p>
+Zur Suche muss mindestens ein Feld befüllt werden. Es empfiehlt
+sich aber so viele Felder wie bekannt zu füllen, um bessere
+Ergebnisse zu erhalten. Die Suche ist relativ resistent gegen
+ungenaue Schreibweisen. Besonders gute Resultate können erzielt
+werden, wenn zusätzlich zu der postalischen Adresse auch
+Koordinaten und ein Suchradius angegeben werden. Dann wird die
+Ähnlichkeitssuche bei Adressschreibweisen auf diese Region
+begrenzt.
+</p>
+
+<p>
+Durch Betätigung der <code>Eingabetaste</code> (⏎) oder per Klick auf den
+<code>Suchen</code>-Knopf wird die Suche ausgelöst. Während der Suche ändert
+sich das Lupensymbol im Suchknopf. Dieses Symbol wird auch unter
+der Eingabemaske dargestellt. Solange das Symbol angezeigt wird,
+ist die Suche nicht abgeschlossen. Nachdem diese Symbol
+ausgeblendet wird werden entweder die Suchergebnisse aktualisiert
+oder links unten eine Fehlermeldung angezeigt.
+</p>
+
+<p>
+Die Abbildung <a href="#orgcb288c4">2</a> zeigt die Benutzeroberfläche nach
+einer erfolgreichen Suche.
+</p>
+
+
+<div id="orgcb288c4" class="figure">
+<p><img src="./images/main_interface_with_results.png" alt="Benutzeroberlfäche" title="Benutzeroberläche" align="center" width="95%" />
+</p>
+<p><span class="figure-number">Abbildung 2: </span>Benutzeroberfläche mit Ergebnissen</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org88c16ee" class="outline-4">
+<h4 id="org88c16ee"><span class="section-number-4">1.1.2</span> Suche nach ähnlichen Adressen</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<p>
+Für die Suche nach ähnlichen Adressen muss mind. 1 Feld abgesehen
+von Koordianten bzw. dem Radius ausgefüllt sein. Es empfiehlt sich
+möglichst viel bekannte Information anzugeben, um gute Ergebnisse
+zu erhalten.
+</p>
+
+<p>
+Werden zusätzlich zu den Adressdaten auch Koordinaten und optional
+ein Suchradius angegeben, so erfolgt die Ähnlichkeitssuche nur in
+diesem geographischen Gebiet. Wird kein Radius angegeben, so wir
+von 0,5km ausgegangen.
+</p>
+
+<p>
+Die Abbildung <a href="#org52c8506">3</a> zeigt so eine Suche mit
+geographischer Einschränkung.
+</p>
+
+
+<div id="org52c8506" class="figure">
+<p><img src="./images/result_distance.png" alt="Ähnlichkeitssuche" title="Ähnlichkeitssuche" align="center" width="95%" />
+</p>
+<p><span class="figure-number">Abbildung 3: </span>Ähnlichkeitssuche mit geographischer Einschränkung</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8abc06c" class="outline-4">
+<h4 id="org8abc06c"><span class="section-number-4">1.1.3</span> Suche nach Adressen in der Nähe</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+Werden ausschließlich Koordinaten und optional ein Radius
+angegeben, so werden die nächstgelegenen Adressen in ungefähr
+diesem Suchradius ausgegeben. Die Abbildung <a href="#org57ac855">4</a>
+zeigt so eine Umkreissuche.
+</p>
+
+
+<div id="org57ac855" class="figure">
+<p><img src="./images/result_reverse_distance.png" alt="Umkreissuche" title="Umkreissuche" align="center" width="95%" />
+</p>
+<p><span class="figure-number">Abbildung 4: </span>Umkreissuche</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga12dafa" class="outline-4">
+<h4 id="orga12dafa"><span class="section-number-4">1.1.4</span> Suchergebnisse</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<p>
+Egal ob eine Suche nach ähnlichen Adresse (siehe <a href="#org88c16ee">1.1.2</a>) oder nach geographischer Nähe (siehe <a href="#org8abc06c">1.1.3</a>) durchgeführt wird, die Darstellung bleibt
+immer die gleiche.  Die Ergebnisse werden unterhalb der
+Eingabemaske für die Suchkriterien aufgelistet. Standardmäßig
+werden nur ein Messwert namens <i>Score<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup></i>, die Adresse ähnlich
+der in Österreich typischen Schreibweise sowie zwei Symbole
+angezeigt. Ein Klick auf das erste Symbol öffnet die
+Kartendarstellung (Abbildung <a href="#org96c48d8">6</a>). Ein Klick auf das zweite
+Symbol blendet Details zum Ergebnis ein oder aus (Abbildung
+<a href="#orgc6e621c">5</a>).
+</p>
+
+<div class="warning">
+<p>
+Der Wert für <i>Score</i> kann und darf nicht als Prozentangabe oder
+ähnliches gewertet werden. Es besteht auch keine Vergleichbarkeit
+zwischen verschiedenen Suchanfragen.
+</p>
+
+</div>
+
+
+<div id="orgc6e621c" class="figure">
+<p><img src="./images/result_detail.png" alt="Ergebnisdetail" title="Ergebnisdetail" align="center" width="95%" />
+</p>
+<p><span class="figure-number">Abbildung 5: </span>Detailansicht eines Ergebnisses</p>
+</div>
+
+<p>
+Für Kartendarstellung (Abbildung <a href="#org96c48d8">6</a>) wird Kartenmaterial von
+<a href="https://www.openstreetmap.org/">https://www.openstreetmap.org/</a> geladen. Die Koordinaten für die
+Markierung und der Text stammen aus der BEV-Suche. Die Karte ist
+nur bedingt zur Darstellung in kleinen Browserfenstern bzw. auf
+kleinen Monitoren geeignet.
+</p>
+
+
+<div id="org96c48d8" class="figure">
+<p><img src="./images/map.png" alt="Kartenansicht" title="Kartenansicht" align="center" width="95%" />
+</p>
+<p><span class="figure-number">Abbildung 6: </span>Kartenansicht</p>
+</div>
+
+<p>
+Damit die Ergebnisansicht übersichtlicher bleibt werden Details
+standardmäßig ausgeblendet und können bei Bedarf eingeblendet
+werden. Wenn an einer Ergebnisposition die Details eingeblendet
+sind, dann merkt sich das System dies für eine unmittelbar darauf
+folgende Suche. Somit kann man z.B. für das erste und gemäß
+Suchalgorithmus beste Ergebnis für aufeinanderfolgende Suchen die
+Details immer einblenden.
+</p>
+
+<div class="note">
+<p>
+Durch Hinzufügen von weiteren Suchkriterien wird die Suche nicht
+zwingend weiter eingeschränkt. Für jede Kombination von
+Suchparametern wird eine andere optimierte Suche angestoßen. Somit
+kann z.B. eine Suche nach PLZ und Hausnummer weniger Ergebnisse
+liefern als eine Suche nach der gleichen PLZ, gleichen Hausnummer
+und einer zusätzlichen Straße.
+</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org27cc830" class="outline-3">
+<h3 id="org27cc830"><span class="section-number-3">1.2</span> Kommandozeilenprogramm</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Über das Kommandozeilenprogramm kann die <a href="#org8267020">1.3</a> einfach
+aufgerufen werden. Die Ergebnisdarstellung eignet sich zur weiteren
+Verwendung in Shell- oder BAT-Scripts.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-txt">usage: java -jar BevRestClient.jar [-a &lt;arg&gt;] [-h] [-i &lt;arg&gt;] [--latitude
+       &lt;arg&gt;] [--longitude &lt;arg&gt;] [-p &lt;arg&gt;] -r &lt;URL&gt; [--radius &lt;arg&gt;] [-s
+       &lt;arg&gt;] [-u] [-z &lt;arg&gt;]
+ -a,--address-line &lt;arg&gt;   street or building name
+ -h,--help
+ -i,--house-id &lt;arg&gt;       house id (e.g. 1/2 or 1 Obj. 7) or building
+                           name
+    --latitude &lt;arg&gt;       latitude of the search center (dot is decimal
+                           comma)
+    --longitude &lt;arg&gt;      longitude of the search center (dot is decimal
+                           comma)
+ -p,--place &lt;arg&gt;          place or municipaliy
+ -r,--rest-url &lt;URL&gt;       URL to the ReST geocoding service
+    --radius &lt;arg&gt;         search radius in km (dot is decimal comma)
+ -s,--separator &lt;arg&gt;      the default field separator is the semi colon
+ -u,--unique-only          print only unique results
+ -z,--postal-code &lt;arg&gt;    postal code
+</pre>
+</div>
+
+<div class="note">
+<p>
+Da für jeden Aufruf die ReST-Schnittstelle initialisiert,
+aufgerufen und ausgewertet werden muss, ist diese Methode nur
+bedingt zur Verarbeitung großer Datenmengen geeignet.
+</p>
+
+<p>
+Ein dedizierter Client, welcher die ReST-Schnittstelle nutzt
+oder ein Erweiterungsmodul am Applikationsserver sind zur
+Verarbeitung großer Datenmengen besser geeignet.
+</p>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8267020" class="outline-3">
+<h3 id="org8267020"><span class="section-number-3">1.3</span> ReST-Schnittstelle</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Die ReST-Schnittstelle stellt 4 Enpunkte zur Verfügung. Mittels
+derer werden die zwei Grundfunktion <i>Geokodierung</i> (Adresse zu
+Koordinaten) und <i>reverse Geokodierung</i> zur Verfügung
+gestellt. Jede der 2 Hauptfunktionen liefert das Ergebnis wahlweise
+im Format <code>at.itbh.bev.api.data.BevQueryResult</code> oder
+<code>at.itbh.bev.api.data.AustrianCommonQueryResult</code>. Details dazu
+finden sich im Abschnitt <a href="#org7256e98">2.1</a>.
+</p>
+
+<div class="tip">
+<p>
+Die Web-Oberfläche (Abschnitt <a href="#org755fc46">1.1</a>) nutzt diese
+Schnittstelle und protokolliert die Such-URL bei reversen
+Geokodierungssuchen und die Suchparameter bei Geokodierungssuchen
+auf der Konsole des Web-Browsers.
+</p>
+
+</div>
+
+<p>
+Die Textbox <a href="#org807705e">1</a> zeigt ein typisches
+JSON-Antwortobjekt. Jedes Antwortobjekt gliedert sich in die drei
+Teile <code>request</code>, <code>response</code> und <code>status</code>.
+</p>
+
+<dl class="org-dl">
+<dt>status</dt><dd>Enthält die Felder <code>code</code>, <code>message</code> und
+<code>responseType</code>. <code>code</code> hat den Wert 0, wenn die Anfrage
+problemlos bearbeitet werden konnte. Werte ungleich 0 weisen
+auf einen Fehler hin. Ist ein Fehler aufgetreten, so kann im
+Feld <code>message</code> eine Fehlerbeschreibung enthalten sein. Das
+Feld <code>responseType</code> beschreibt welche Daten mindestens in der
+Liste der Ergebnisse unter <code>response</code> enthalten sind.</dd>
+<dt>request</dt><dd>Enthält eine Zusammenfassung der Anfrageparameter</dd>
+<dt>response</dt><dd>Enthält eine Liste von Antwortobjekten. Jedes
+Antwortobjekt enthält ein Feld <code>score</code>, welches eine Maßzahl
+für die Ähnlichkeit zwischen Anfrage und Antwort enthält. Das
+Feld <code>distance</code> ist gefüllt, wenn für das Antwortobjekt
+Koordinaten bekannt sind und in der Anfrage ebenso Koordinaten
+enthalten waren. Das Feld <code>address</code> enthält die tatsächlichen
+Adressdaten gemäß <code>responseType</code>.</dd>
+</dl>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Programmlisting 1 </span>Aufbau eines ReST-Antwortobjekts</label><pre class="src src-json" id="org807705e"><span style="color: #8c8c8c;">{</span>
+   <span style="color: #b4fa70;">"request"</span>:<span style="color: #93a8c6;">{</span>
+      <span style="color: #b4fa70;">"latitude"</span>:<span style="color: #e9b2e3;">null</span>,
+      <span style="color: #b4fa70;">"longitude"</span>:<span style="color: #e9b2e3;">null</span>,
+      <span style="color: #b4fa70;">"postalCode"</span>:<span style="color: #e9b96e;">"3202"</span>,
+      <span style="color: #b4fa70;">"place"</span>:<span style="color: #e9b96e;">"Gr&#252;nau"</span>,
+      <span style="color: #b4fa70;">"addressLine"</span>:<span style="color: #e9b96e;">"Kirchenpl."</span>,
+      <span style="color: #b4fa70;">"houseId"</span>:<span style="color: #e9b96e;">"3"</span>,
+      <span style="color: #b4fa70;">"radius"</span>:<span style="color: #e9b2e3;">null</span>
+   <span style="color: #93a8c6;">}</span>,
+   <span style="color: #b4fa70;">"response"</span>:<span style="color: #93a8c6;">[</span>
+      <span style="color: #b0b1a3;">{</span>
+         <span style="color: #b4fa70;">"score"</span>:<span style="color: #e9b2e3;">8.940395</span>,
+         <span style="color: #b4fa70;">"distance"</span>:<span style="color: #e9b2e3;">null</span>,
+         <span style="color: #b4fa70;">"address"</span>:<span style="color: #97b098;">{</span>
+            <span style="color: #b4fa70;">"id"</span>:<span style="color: #e9b96e;">"7323912-001"</span>,
+            <span style="color: #b4fa70;">"adrcd"</span>:<span style="color: #e9b96e;">"7323912"</span>,
+            <span style="color: #b4fa70;">"bestimmungsart"</span>:<span style="color: #e9b96e;">"Q"</span>,
+            <span style="color: #b4fa70;">"bestimmungsartGebaeude"</span>:<span style="color: #e9b96e;">"Q"</span>,
+            <span style="color: #b4fa70;">"eigenschaft"</span>:<span style="color: #e9b96e;">"01"</span>,
+            <span style="color: #b4fa70;">"epsg"</span>:<span style="color: #e9b96e;">"31256"</span>,
+            <span style="color: #b4fa70;">"epsgGebaeude"</span>:<span style="color: #e9b96e;">"31256"</span>,
+            <span style="color: #b4fa70;">"gemeindename"</span>:<span style="color: #e9b96e;">"Hofstetten-Gr&#252;nau"</span>,
+            <span style="color: #b4fa70;">"gkz"</span>:<span style="color: #e9b96e;">"31909"</span>,
+            <span style="color: #b4fa70;">"gnradresse"</span>:<span style="color: #e9b96e;">"0"</span>,
+            <span style="color: #b4fa70;">"hauptadresse"</span>:<span style="color: #e9b96e;">"1"</span>,
+            <span style="color: #b4fa70;">"hausnrbereich"</span>:<span style="color: #e9b96e;">"keine Angabe"</span>,
+            <span style="color: #b4fa70;">"hausnrbuchstabe1"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrbuchstabe2"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrbuchstabe3"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrbuchstabe4"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrgebaeudebez"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrtext"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrverbindung1"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrverbindung2"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrverbindung3"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hausnrzahl1"</span>:<span style="color: #e9b96e;">"3"</span>,
+            <span style="color: #b4fa70;">"hausnrzahl2"</span>:<span style="color: #e9b2e3;">null</span>,
+            <span style="color: #b4fa70;">"hausnrzahl3"</span>:<span style="color: #e9b2e3;">null</span>,
+            <span style="color: #b4fa70;">"hausnrzahl4"</span>:<span style="color: #e9b2e3;">null</span>,
+            <span style="color: #b4fa70;">"hofname"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"hw"</span>:<span style="color: #e9b96e;">"329312.69"</span>,
+            <span style="color: #b4fa70;">"hwGebaeude"</span>:<span style="color: #e9b96e;">"329312.69"</span>,
+            <span style="color: #b4fa70;">"objektnummer"</span>:<span style="color: #e9b96e;">"2178814"</span>,
+            <span style="color: #b4fa70;">"okz"</span>:<span style="color: #e9b96e;">"05468"</span>,
+            <span style="color: #b4fa70;">"ortsname"</span>:<span style="color: #e9b96e;">"Gr&#252;nau"</span>,
+            <span style="color: #b4fa70;">"plz"</span>:<span style="color: #e9b96e;">"3202"</span>,
+            <span style="color: #b4fa70;">"quelladresse"</span>:<span style="color: #e9b96e;">"G"</span>,
+            <span style="color: #b4fa70;">"quelladresseGebaeude"</span>:<span style="color: #e9b96e;">"G"</span>,
+            <span style="color: #b4fa70;">"rw"</span>:<span style="color: #e9b96e;">"-61809.01"</span>,
+            <span style="color: #b4fa70;">"rwGebaeude"</span>:<span style="color: #e9b96e;">"-61809.01"</span>,
+            <span style="color: #b4fa70;">"skz"</span>:<span style="color: #e9b96e;">"048362"</span>,
+            <span style="color: #b4fa70;">"strassenname"</span>:<span style="color: #e9b96e;">"Kirchenplatz"</span>,
+            <span style="color: #b4fa70;">"strassennamenzusatz"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"subcd"</span>:<span style="color: #e9b96e;">"001"</span>,
+            <span style="color: #b4fa70;">"szusadrbest"</span>:<span style="color: #e9b96e;">"0"</span>,
+            <span style="color: #b4fa70;">"zaehlsprengel"</span>:<span style="color: #e9b96e;">"31909000"</span>,
+            <span style="color: #b4fa70;">"latitude"</span>:<span style="color: #e9b2e3;">48.099264730065684</span>,
+            <span style="color: #b4fa70;">"longitude"</span>:<span style="color: #e9b2e3;">15.502287804265958</span>,
+            <span style="color: #b4fa70;">"location"</span>:<span style="color: #aebed8;">{</span>
+               <span style="color: #b4fa70;">"latitude"</span>:<span style="color: #e9b2e3;">48.099264730065684</span>,
+               <span style="color: #b4fa70;">"longitude"</span>:<span style="color: #e9b2e3;">15.502287804265958</span>
+            <span style="color: #aebed8;">}</span>,
+            <span style="color: #b4fa70;">"addressName"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"postalCode"</span>:<span style="color: #e9b96e;">"3202"</span>,
+            <span style="color: #b4fa70;">"municipality"</span>:<span style="color: #e9b96e;">"Hofstetten-Gr&#252;nau"</span>,
+            <span style="color: #b4fa70;">"place"</span>:<span style="color: #e9b96e;">"Gr&#252;nau"</span>,
+            <span style="color: #b4fa70;">"street"</span>:<span style="color: #e9b96e;">"Kirchenplatz"</span>,
+            <span style="color: #b4fa70;">"buildingName"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"houseNumber"</span>:<span style="color: #e9b2e3;">3</span>,
+            <span style="color: #b4fa70;">"houseNumberAddition"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"buildingId"</span>:<span style="color: #e9b96e;">""</span>,
+            <span style="color: #b4fa70;">"houseId"</span>:<span style="color: #e9b96e;">"3"</span>,
+            <span style="color: #b4fa70;">"addressLine"</span>:<span style="color: #e9b96e;">"KirchenplatzKirchenplatzKirchenplatz"</span>
+         <span style="color: #97b098;">}</span>
+      <span style="color: #b0b1a3;">}</span>
+   <span style="color: #93a8c6;">]</span>,
+   <span style="color: #b4fa70;">"status"</span>:<span style="color: #93a8c6;">{</span>
+      <span style="color: #b4fa70;">"code"</span>:<span style="color: #e9b2e3;">0</span>,
+      <span style="color: #b4fa70;">"message"</span>:<span style="color: #e9b2e3;">null</span>,
+      <span style="color: #b4fa70;">"responseType"</span>:<span style="color: #e9b96e;">"at.itbh.bev.api.data.BevQueryResult"</span>
+   <span style="color: #93a8c6;">}</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org54d5300" class="outline-4">
+<h4 id="org54d5300"><span class="section-number-4">1.3.1</span> Ähnlichkeitssuche mit detaillierter Antwort</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<p>
+URL: <code>/bev-search-rest/v1/at/geocode</code>
+</p>
+
+<p>
+Es werden ähnlich geschriebene Adressen gesucht.
+</p>
+
+<p>
+Die Parameter werden als <code>GET</code>-Parameter in der URL
+übergeben. Eine Beschreibung der Parameter findet sich in Tabelle
+<a href="#org7b28375">1</a>. Abgesehen von <code>latitude</code>, <code>longitude</code> und
+<code>radius</code> muss mind. ein Parameter übergeben werden.
+</p>
+
+<p>
+Über diese URL werden Antworten vom Typ
+<code>at.itbh.bev.api.data.BevQueryResult</code> geliefert.
+</p>
+
+<table id="org7b28375" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Tabelle 1</span> Parameter für die Geokodierung</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Parameter</th>
+<th scope="col" class="org-left">Beschreibung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>postalCode</code></td>
+<td class="org-left">Postleitzahl</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>place</code></td>
+<td class="org-left">Ort oder Gemeinde</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>addressLine</code></td>
+<td class="org-left">Üblicherweise ist dies der Straßenname. Da es nicht zwingend Straßennamen gibt, kann dies auch der Ortsname bei kleinen Dördern oder ein textuelle Bezeichnung für ein Gebäude (z.B. ein Hofname) sein.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>houseId</code></td>
+<td class="org-left">Dies ist die Hausnummer inkl. einer weiteren Identifikation wie Stiege, Haus oder Objekt, etc. Wohnungsidentifikation werden nicht unterstützt. Beispiele: <i>1</i>, <i>1a</i>, <i>1-3</i>, <i>1a-3b</i>, <i>1 Stiege 3</i>, <i>1 Strg. 3</i>, <i>1 Obj, 4</i>, <i>1b/4</i>, etc.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>latitude</code></td>
+<td class="org-left">Geographische Länge (GPS) eines Punktes auf der Landkarte zur Einschränkung der Suche auf ein Gebiet</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>longitude</code></td>
+<td class="org-left">Geographische Breites (GPS) eines Punktes auf der Landkarte zur Einschränktung der Suche auf ein Gebiet</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>radius</code></td>
+<td class="org-left">Suchradius in km (Dezimalzahlen mit Punkt als Komma erlaubt) um den Punkt auf der Landkarte (lieber etwas größer wählen, weil aufgrund von Verzerrungen bei der Kartenprojektion keine exakten Suchradien genutzt werden können.)</td>
+</tr>
+</tbody>
+</table>
+
+<div class="note">
+<p>
+Da es sich um GET-Parameter handelt, müssen diese stets
+URL-enkodiert sein. Groß- und Kleinschreibung beim Parameternamen
+wird unterschieden.
+</p>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb179e22" class="outline-4">
+<h4 id="orgb179e22"><span class="section-number-4">1.3.2</span> Ähnlichkeitssuche mit vereinfachter Antwort</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<p>
+URL: <code>/bev-search-rest/v1/at/common/geocode</code>
+</p>
+
+<p>
+Diese URL entspricht in der Funktionalität der URL aus Abschnitt
+<a href="#org54d5300">1.3.1</a>, wobei Resultate vom
+Typ <code>at.itbh.bev.api.data.AustrianCommonQueryResult</code> geliefert
+werden.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org87fdd1c" class="outline-4">
+<h4 id="org87fdd1c"><span class="section-number-4">1.3.3</span> Positionssuche mit detaillierter Antwort</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<p>
+URL: <code>/bev-search-rest/v1/at/geocode/{latitude}/{longitude}/{radius}</code>
+</p>
+
+<p>
+Es werden Adressen gesucht, die möglichst nahe der über die
+Parameter definierten GPS-Koordinaten innerhalb des Suchradius
+liegen. Die Ergebnisse sind nach ihrer Distanz zu den
+GPS-Koordinaten in aufsteigender Reihenfolge sortiert.
+</p>
+
+<p>
+Es werden Resultate vom Datentyp
+<code>at.itbh.bev.api.data.BevQueryResult</code> geliefert. Die Parameter
+werden direkt in der URL übergeben (ohne geschweifte
+Klammern). Das Dezimaltrennzeichen ist ein Punkt.
+</p>
+
+<table id="org106d845" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Tabelle 2</span> Parameter für die reverse Geokodierung</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Parameter</th>
+<th scope="col" class="org-left">Beschreibung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>latitude</code></td>
+<td class="org-left">geographische Länge (~ Y-Koordinate, Nordwert, Northing)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>longitude</code></td>
+<td class="org-left">geographische Breite (~ X-Koordinate, Rechtswert, Easting)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>radius</code></td>
+<td class="org-left">Suchradius in km. Den Radius lieber etwas größer wählen, weil aufgrund von Verzerrungen während der Kartenprojektion kein exakter Kreis garantiert werden kann. Dieser Parameter ist optinal und kann weggelassen werden. Die Standardeinstellung für den Suchradius beträgt 0.5km</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-org2cc31d0" class="outline-4">
+<h4 id="org2cc31d0"><span class="section-number-4">1.3.4</span> Positionssuche mit vereinfachter Antwort</h4>
+<div class="outline-text-4" id="text-1-3-4">
+<p>
+URL: <code>/bev-search-rest/v1/at/common/geocode/{latitude}/{longitude}/{radius}</code>
+</p>
+
+<p>
+Diese URL entspricht in der Funktionalität der URL aus Abschnitt
+<a href="#org87fdd1c">1.3.3</a>, wobei Resultate vom Typ
+<code>at.itbh.bev.api.data.AustrianCommonQueryResult</code> geliefert werden.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc6734b7" class="outline-2">
+<h2 id="orgc6734b7"><span class="section-number-2">2</span> Technische Dokumentation</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-org7256e98" class="outline-3">
+<h3 id="org7256e98"><span class="section-number-3">2.1</span> Systemarchitektur</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+   Die gesamte Server-Applikation basiert auf der <i>Java EE7</i><sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>
+o   Technologie und benötigt <i>Java 8</i><sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup> und den <i>Wilfly 10</i><sup><a id="fnr.5" class="footref" href="#fn.5">5</a></sup>
+   Applikationserver. Als Datenbank kommt das Datenbanksystem
+   <i>H2</i><sup><a id="fnr.6" class="footref" href="#fn.6">6</a></sup> als eingebettete Datenbank zum Einsatz.
+</p>
+
+<p>
+Die Applikation gliedert sich in 5 Module, welche als WAR-Archiv am
+Applikationsserver installiert sind. Durch die Modularität wird
+erreicht, dass unterschiedliche Clients an die Kernfunktion
+angebunden werden können.
+</p>
+
+<dl class="org-dl">
+<dt>bev-search-api</dt><dd>Die EJB3-Schnittstellendefinition für lokale Zugriffe.</dd>
+<dt>bev-search-core</dt><dd>Implementiert die EJB3-Schnittstelle und
+stellt somit die Suchfunktion zur Verfügung. Die Suchfunktion
+wird mittels eines Lucene-Suchindex bereit gestellt. Dieser
+wird mittels Hibernat Search aus der H2-Datenbank
+berechnet. Die H2-Datenbank enthält die Daten des Bundesamtes
+für Eich- und Vermessungswesen. Die Daten dürfen darin nicht
+geändert werden, außer es werden neue BEV-Daten eingespielt.</dd>
+<dt>bev-search-rest</dt><dd>Die Suchfunktion wird über eine
+ReST-Schnittstelle zur Verfügung stellt, welche ausschließlich
+per HTTP-=GET= Suchergebnisse liefert. Das Datenformat der
+Übermittlung ist JSON in UTF-8-Zeichenkodierung.</dd>
+<dt>bev-search-ui</dt><dd>Die Benutzeroberfläche ist in Dart<sup><a id="fnr.7" class="footref" href="#fn.7">7</a></sup> mit Polymer<sup><a id="fnr.8" class="footref" href="#fn.8">8</a></sup>
+implemenentiert und nutzt die die ReST-Schnittstelle des
+Moduls <code>bev-search-rest</code>.</dd>
+<dt>bev-search-rest-client</dt><dd>Dieses Java-Kommandozeilenprogramm
+macht die ReST-Schnittstelle von der Kommandozeile aus
+nutzbar.</dd>
+</dl>
+
+
+<p>
+Weitere Schnittstelle wie z.B. SOAP oder EJB3 mit Remote-Interface
+oder ähnliches kann in dieser Architektur leicht hinzugefügt
+werden.
+</p>
+
+<p>
+Die Antwort auf Suchanfragen wird in 2 Detaillierungsgraden zur
+Verfügung gestellt. Für Details zu den Antwortypen sei auf die
+Javadoc-Dokumentation verwiesen.
+</p>
+
+<dl class="org-dl">
+<dt>at.itbh.bev.api.data.BevQueryResult</dt><dd>Dieser Antworttyp liefert
+detaillierte Ergebnisse und weicht kaum von der Datenstruktur
+des BEV ab.</dd>
+<dt>at.itbh.bev.api.data.AustrianCommonQueryResult</dt><dd>Dieser
+Antwortyp liefert Ergebnisse, welche der üblichen
+österreichischen Schreibweise für Adressen sehr ähnelt. Dabei
+geht jedoch Information aus dem BEV-Datebnmodell verloren.</dd>
+</dl>
+
+
+<div class="note">
+<p>
+Die Definition der Antworttypen definiert die Minimalanforderung an
+die zu retournierenden Datenfelder. Je nach Implementierung ist es
+möglich, dass auch zusätzliche Datenfelder geliefert werden. Die
+zusätzlichen Datenfelder sollen (dürfen) nicht verwendet werden, da
+es keine Garantie auf Korrektheit und Übereinstimmung mit den
+definierten Datenfeldern gibt.
+</p>
+
+<p>
+Beispielweise nutzt die derzeitige ReST-Schnittstelle für beide
+Antworttypen das gleiche Antwortobjekt. Verlässlich sind aber nur
+die Informationen gemäß Antworttyp.
+</p>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9e93bc9" class="outline-3">
+<h3 id="org9e93bc9"><span class="section-number-3">2.2</span> Kompilieren</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Der Quellcode der Applikationskomponenten ist unter
+<a href="https://bitbucket.org/account/user/itbh/projects/BEV">https://bitbucket.org/account/user/itbh/projects/BEV</a> gespeichert
+und versioniert. Die gesamte Applikation ist in 3 Git-Repositiers
+untereilt:
+</p>
+
+<dl class="org-dl">
+<dt><a href="https://bitbucket.org/itbh/bev_server">https://bitbucket.org/itbh/bev_server</a></dt><dd>Die Komponenten, welche
+mittels Java Technologien umgesetzt wurden. Die enthaltenen
+Module sind <code>bev-search-api</code>, <code>bev-search-core</code>,
+<code>bev-search-rest</code>, <code>bev-search-rest-client</code>.</dd>
+<dt><a href="https://bitbucket.org/itbh/bev_ui">https://bitbucket.org/itbh/bev_ui</a></dt><dd>Die Benutzeroberfläche,
+welche mit Dart umgesetzt ist und als WAR-Archiv auf dem
+Applikationsserver installiert werden kann.</dd>
+<dt><a href="https://bitbucket.org/itbh/bev_docs">https://bitbucket.org/itbh/bev_docs</a></dt><dd>Anwenderdokumentation,
+Technische Dokumentation, Javadoc, Dartdoc</dd>
+</dl>
+</div>
+
+<div id="outline-container-orgf6a5a37" class="outline-4">
+<h4 id="orgf6a5a37"><span class="section-number-4">2.2.1</span> bev_server</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+Der Übersetzungsvorgang erfolgt unter Verwendung von Apache
+Maven<sup><a id="fnr.9" class="footref" href="#fn.9">9</a></sup>. Die zentrale Steuerung des Kompiliervorgangs mit Ausnahme
+des Kommandozeilenprogramms erfolgt über die <code>pom.xml</code>-Datei auf
+oberster Verzeichnisebene. Das Kommandozeilenprogramm wird
+ebenfalls mittels Apache Maven übersetzt. Die zugehörige
+<code>pom.xml</code>-Datei befindet sich im Verzeichnis
+<code>bev-search-rest-client</code>.
+</p>
+
+<p>
+Die Verzeichnisse in diesem Respository sind allesamt
+Eclipse<sup><a id="fnr.10" class="footref" href="#fn.10">10</a></sup>-Projekte. Unter Nutzung der JBoss Tools<sup><a id="fnr.11" class="footref" href="#fn.11">11</a></sup> in
+Eclipse können die Projekte ganz einfach übersetzt und auf einem
+Wilfly 10 Applikationsserver installiert werden.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org375fa65" class="outline-4">
+<h4 id="org375fa65"><span class="section-number-4">2.2.2</span> bev_ui</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+Dieses Repository enthält ein Dart-Projekt in der
+empfohlenen/benötigten Verzeichnisstruktur. Der
+Übersetzungsvorgang wird mit dem Kommando <code>pub build</code>
+gestartet. Das Verzeichnis <code>web</code> im Verzeichnis <code>build</code> muss
+manuell in <code>bev-search-ui.war</code> umbenannt werden. Danach kann das
+Verzeichnis <code>bev-search-ui.war</code> am Applikationsserver installiert
+werden.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgecbc55f" class="outline-4">
+<h4 id="orgecbc55f"><span class="section-number-4">2.2.3</span> bev_docs</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+Das Verzeichnis <code>javadoc</code> enthält die Quellcode-Dokumentation der
+Java-Komponentent. Das Verzeichnis <code>dartdoc</code> enthält die
+Quellcode-Dokumentation der Dart-Komponenten. Das Verzeichnis
+<code>userdoc</code> enthält diese Benutzerdokumentation.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5d93679" class="outline-3">
+<h3 id="org5d93679"><span class="section-number-3">2.3</span> Installation</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Der Wildfly 10 Applikationsserver muss von der offiziellen Website
+herunter geladen und gemäß der offiziellen Dokumentation
+installiert werden.
+</p>
+
+<p>
+Die Installation der Applikation erfolgt indem die jeweiligen
+Module mit der Dateinamensendung <code>.war</code> bzw. <code>.jar</code> in das
+<code>deployments</code>-Verzeichnis des Applikationsservers kopiert
+werden. Für jedes Modul Modul muss eine weitere Datei names
+<code>&lt;Modulname&gt;.war.dodeploy</code> angelegt werden. Sofern das
+Auto-Deploy-Modul am Applikationsserver aktiv ist, werden die
+Module installiert.
+</p>
+
+<p>
+Für Details zum Installationsvorgang sei auf die Dokumentation des
+Wildfly-Applikationsservers verwiesen.
+</p>
+
+<div class="note">
+<p>
+Bevor die Module installiert werden, muss der Applikationsserver
+entsprechend konfiguriert sein. Siehe dazu Abschnitt <a href="#org951e5d3">2.4</a>.
+</p>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-org951e5d3" class="outline-3">
+<h3 id="org951e5d3"><span class="section-number-3">2.4</span> Konfiguration</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+Damit die Module installiert und genutzt werden können, müssen die
+folgenden Systemvariablen konfiguriert werden.
+</p>
+
+<dl class="org-dl">
+<dt>hibernate.search.default.indexBase</dt><dd>Das Verzeichnis in dem der Suchindex
+gespeichert werden soll. Der Applikationsserver benötigt in
+diesem Verzeichnis Schreibrechte.</dd>
+<dt>at.itbh.bev.csv.location</dt><dd>Das Verzeichnis in dem die
+CSV-Dateien <i>und</i> die beiden SQL-Scripts <code>import_data.sql</code> und
+<code>prepare_data.sql</code> abgelegt sind. Die beiden SQL-Scripts
+befinden sich im Verzeichnis <code>database</code> im Repository
+<code>bev_server</code>. Für dieses Verzeichnis reichen Leserechte.</dd>
+<dt>at.itbh.bev.results.max</dt><dd>max. Anzahl an Suchergebnissen pro
+Suche. 100 ist erfahrungsgemäß ein guter Wert.</dd>
+<dt>at.itbh.bev.results.prune</dt><dd>Wenn <code>true</code> werden nur jene
+Ergebnisse deren Score im Vergleich zu den anderen Ergebnissen
+relativ eng beisammen liegen retourniert (2
+aufeinanderfolgende Score-Differenzen dürfen sich nicht mehr als
+um das 1,9-fache unterscheiden). Wenn diese Heuristik aktiv
+ist, können sehr oft gute, eindeutige Adresszuordnungen erzielt
+werden.</dd>
+</dl>
+
+
+<p>
+Zur Konfiguration kann die Kommandozeilenschnittstelle
+<code>jboss-cli.sh</code> bzw. <code>jboss-cli.bat</code> genutzt werden, indem die
+folgenden Befehle ausgeführt werden. Die Platzhalter in den spitzen
+Klammern müssen durch konkrete Werte ersetzt werden.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-txt">/system-property=at.itbh.bev.csv.location:add(value="&lt;PATH COMES HERE&gt;")
+/system-property=at.itbh.bev.results.max:add(value="&lt;NUMBER&gt;")
+/system-property=at.itbh.bev.results.prune:add(value="&lt;BOOLEAN&gt;")
+/system-property=hibernate.search.default.indexBase:add(value="&lt;PATH COMES HERE&gt;")
+</pre>
+</div>
+
+<p>
+Die Datenbankkonfiguration erfolgt über die Datenquellen des
+Applikationsservers. Der folgendes Auszug beschreibt die benötigte
+Konfiguration, wobei der Pfad zur H2-Datenbank angepasst werden
+kann.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-txt">&lt;datasource
+    jndi-name="java:jboss/datasources/at.itbh.bevDS"
+    pool-name="at.itbh.bev" enabled="true"
+    use-java-context="true"&gt;
+    &lt;connection-url&gt;
+        jdbc:h2:~/bev/bev;AUTOCOMMIT=FALSE;DB_CLOSE_ON_EXIT=FALSE;TRACE_LEVEL_FILE=3
+    &lt;/connection-url&gt;
+    &lt;driver&gt;h2&lt;/driver&gt;
+    &lt;security&gt;
+        &lt;user-name&gt;sa&lt;/user-name&gt;
+        &lt;password&gt;&lt;/password&gt;
+    &lt;/security&gt;
+&lt;/datasource&gt;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org9bc0b28" class="outline-3">
+<h3 id="org9bc0b28"><span class="section-number-3">2.5</span> Datenimport</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+Die aktuellen CSV-Dateien müssen in das Verzeichnis
+<code>at.itbh.bev.csv.location</code> kopiert werden. Danach löst ein Aufruf
+der URL <code>/v1/at/refresh/</code> den Aktualisierungsvorgang, welcher lange
+dauern kann, aus. Zur Beschleunigung des Aktualisierungsvorganges
+kann der Applikationsserver herunter gefahren, die Datenbankdatei
+mit der leeren Datenbankdatei <code>bev.mv.db.empty</code> überschrieben, der
+Applikationsserver wieder hochgefahren und die Aktualisierungs-URL
+aufgerufen werden.
+</p>
+
+<div class="warning">
+<p>
+Während des Datenimports kann die Suchfunktion nicht genutzt
+werden, weil der Suchindex zerstört wird, um neu aufgebaut zu
+werden.
+</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7d98877" class="outline-2">
+<h2 id="org7d98877"><span class="section-number-2">3</span> Lizenz</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-org5002ee6" class="outline-3">
+<h3 id="org5002ee6"><span class="section-number-3">3.1</span> Daten</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Für die Daten gilt die Lizenz des Bundesamters für Eich- und
+Vermessungswesen.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1e5a3b2" class="outline-3">
+<h3 id="org1e5a3b2"><span class="section-number-3">3.2</span> Applikation</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Für die Applikation gilt die GNU Affero 
+TODO
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Fu&szlig;noten: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
+Dieser Suchdienst stammt von DI Christoph D. Hermann
+(<a href="http://www.itbh.at/">http://www.itbh.at/</a>) und arbeitet auf Daten des Bundesamtes für Eich-
+und Vermessungswesen. Das Bundesamt für Eich- und Vermessungswesen hat
+keinen Bezug zu diesem Suchdienst.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><p class="footpara">
+Unter <i>Score</i> wird eine Punktezahl verstanden, welche
+beschreibt wie gut das Suchergebnis zu der Anfrage passt. Je höher die
+Zahl, desto besser. Diese Punktezahl darf nicht Prozentangaben
+verwechselt werden. Es gibt keine max. mögliche Punktezahl. Ebenso
+sind die Punktezahlen zwischen zwei unterschiedlichen Suchen nicht
+vergleichbar.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://docs.oracle.com/javaee/7/tutorial/">https://docs.oracle.com/javaee/7/tutorial/</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> <div class="footpara"><p class="footpara">
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5">5</a></sup> <div class="footpara"><p class="footpara">
+<a href="http://wildfly.org/downloads/">http://wildfly.org/downloads/</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6">6</a></sup> <div class="footpara"><p class="footpara">
+<a href="http://www.h2database.com/html/main.html">http://www.h2database.com/html/main.html</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.7" class="footnum" href="#fnr.7">7</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://www.dartlang.org/">https://www.dartlang.org/</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.8" class="footnum" href="#fnr.8">8</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://pub.dartlang.org/packages/polymer">https://pub.dartlang.org/packages/polymer</a> und
+<a href="https://www.polymer-project.org/1.0/">https://www.polymer-project.org/1.0/</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.9" class="footnum" href="#fnr.9">9</a></sup> <div class="footpara"><p class="footpara">
+TODO Maven
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.10" class="footnum" href="#fnr.10">10</a></sup> <div class="footpara"><p class="footpara">
+Eclipse
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.11" class="footnum" href="#fnr.11">11</a></sup> <div class="footpara"><p class="footpara">
+JBoss Tools
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Autor: DI Christoph D. Hermann (ITBH) &lt;christoph.hermann@itbh.at&gt;</p>
+<p class="date">Created: 2017-04-28 Fri 23:24</p>
+<p class="validation"></p>
+</div>
+</body>
+</html>

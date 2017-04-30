@@ -1,0 +1,162 @@
+body, html {
+    display: block;
+    box-sizing: border-box;
+
+    color: #212121;
+    font: 400 16px/24px Roboto,sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: #257E12;
+}
+
+p {
+    font: 400 16px/24px Roboto,sans-serif;
+    margin: 16px 0;
+    padding: 0;
+}
+
+h1, h2 {
+    color: #757575;
+    font: 300 34px/40px Roboto,sans-serif;
+    letter-spacing: -.01em;
+    margin: 40px 0 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    overflow: hidden;
+    padding: 0;
+    text-overflow: ellipsis;
+}
+
+#content {
+    min-height: calc(100vh - 478px);
+    max-width: 840px;
+    padding: 16px;
+    margin: auto;
+}
+
+.status {
+    width: 960px;
+    margin: auto;
+    padding-top: 24px;
+}
+
+.status p {
+    text-align: right;
+}
+
+img {
+    cursor: -moz-zoom-in;
+    cursor: -webkit-zoom-in;
+    cursor: zoom-in;
+}
+
+table {
+    border: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font: 14px/20px Roboto,sans-serif;
+    margin: 16px 0;
+    width: 100%;
+}
+
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+
+thead {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    background: #757575;
+    border: 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+th {
+    color: #fff;
+    font: 500 16px/24px Roboto,sans-serif;
+    height: 48px;
+    padding: 8px;
+    vertical-align: middle;
+}
+
+th.org-left {
+    text-align: left;
+}
+
+td {
+    background: rgba(255,255,255,.95);
+    vertical-align: top;
+    color: #212121;
+    padding: 7px 8px 8px;
+    border: 0;
+    margin: 0;
+    text-align: left;
+    display: table-cell;
+}
+
+code {
+    font-family: 'Roboto Mono', monospace;
+    font-size: .9em;
+}
+
+pre {
+    font-family: 'Roboto Mono', monospace;
+    font-size: .9em;
+    background: #eee;
+    overflow: scroll;
+}
+
+pre.src {
+    overflow: scroll;
+}
+
+.mdl-layout__header {
+    background-color: #257E12;
+    color: #fff;
+}
+
+.mdl-layout__header i {
+    color: #fff;
+}
+
+/*
+.mdl-layout__drawer {
+    left: -250px;
+}
+
+.mdl-layout__drawer.is-visible {
+    max-width: 100%;
+    width: 500px;
+    left: 0px;
+}
+
+.mdl-layout--fixed-drawer.is-upgraded:not(.is-small-screen)>.mdl-layout__header {
+    margin-left: 0px;
+    width: 100%;
+}
+
+.mdl-layout--fixed-drawer>.mdl-layout__content {
+    margin-left: 0px;
+}
+*/

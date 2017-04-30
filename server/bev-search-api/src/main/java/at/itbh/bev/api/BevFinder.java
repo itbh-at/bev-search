@@ -1,3 +1,22 @@
+/* 
+ * BevFinder.java
+ * 
+ * Copyright (C) 2017 Christoph D. Hermann <christoph.hermann@itbh.at>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package at.itbh.bev.api;
 
 import java.util.List;
@@ -38,31 +57,33 @@ public interface BevFinder {
 	 *            <code>Obj. 274</code> are valid input. May be
 	 *            <code>null</code>.
 	 * @return
-	 * @throws InvalidApiUsageException 
+	 * @throws InvalidApiUsageException
 	 */
 	@PermitAll
-	public GeocodingResult<BevQueryResult> geocode(String postalCode, String place, String addressLine, String houseId) throws InvalidApiUsageException;
+	public GeocodingResult<BevQueryResult> geocode(String postalCode, String place, String addressLine, String houseId)
+			throws InvalidApiUsageException;
 
 	/**
 	 * Search for a similar address 1km around the search center defined by
 	 * <code>latitude</code> and <code>longitude</code>-
-	 * @throws InvalidApiUsageException 
+	 * 
+	 * @throws InvalidApiUsageException
 	 * 
 	 * @see BevFinder#geocode(String, String, String, String)
 	 */
 	public GeocodingResult<BevQueryResult> geocode(String postalCode, String place, String addressLine, String houseId,
 			Double latitude, Double longitude) throws InvalidApiUsageException;
-	
+
 	/**
-	 * Search for a similar address <code>radius</code> km around the search center defined by
-	 * <code>latitude</code> and <code>longitude</code>-
-	 * @throws InvalidApiUsageException 
+	 * Search for a similar address <code>radius</code> km around the search
+	 * center defined by <code>latitude</code> and <code>longitude</code>-
+	 * 
+	 * @throws InvalidApiUsageException
 	 * 
 	 * @see BevFinder#geocode(String, String, String, String)
 	 */
 	public GeocodingResult<BevQueryResult> geocode(String postalCode, String place, String addressLine, String houseId,
 			Double latitude, Double longitude, Float radius) throws InvalidApiUsageException;
-
 
 	/**
 	 * Find addresses near to the provided GPS coordinates (EPSG:4326)
@@ -76,7 +97,8 @@ public interface BevFinder {
 	 *         distance to the provided coordinates in ascending order.
 	 */
 	@PermitAll
-	public GeocodingResult<BevQueryResult> reverseGeocode(@NotNull Double latitude, @NotNull Double longitude, Float radius) throws InvalidApiUsageException;
+	public GeocodingResult<BevQueryResult> reverseGeocode(@NotNull Double latitude, @NotNull Double longitude,
+			Float radius) throws InvalidApiUsageException;
 
 	/**
 	 * Lookup addresses by the BEV id <code>ADRCD</code>

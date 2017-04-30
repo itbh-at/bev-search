@@ -1,61 +1,146 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
-	<parent>
-        <groupId>at.itbh.bev</groupId>
-        <artifactId>bev-search</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-	
-	<artifactId>bev-search-api</artifactId>
-	<packaging>ejb</packaging>
-	<name>Public BEV data search API</name>
-	
-	<dependencies>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+pom.xml - Build file for Java EE API of the BEV search system
 
-		<!-- Define the version of JBoss' Java EE 7 APIs we want to import. Any 
-			dependencies from org.jboss.spec will have their version defined by this 
-			BOM -->
-		<!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill 
-			of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
-			of artifacts. We use this here so that we always get the correct versions 
-			of artifacts. Here we use the jboss-javaee-7.0 stack (you can read this as 
-			the JBoss stack of the Java EE 7 APIs). You can actually use this stack with 
-			any version of WildFly that implements Java EE 7, not just JBoss WildFly 
-			10! -->
-		<dependency>
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-7.0</artifactId>
-			<version>${version.jboss.spec.javaee.7.0}</version>
-			<type>pom</type>
-			<scope>import</scope>
-		</dependency>
-	</dependencies>
+Copyright (C) 2017 Christoph D. Hermann <christoph.hermann@itbh.at>
 
-	<build>
-		<!-- Set the name of the deployment -->
-		<finalName>${project.artifactId}</finalName>
-		<plugins>
-			<!-- This jar is deployed to WildFly as a JBoss Module, which we can depend 
-				on from other deployments -->
-			<plugin>
-				<groupId>org.wildfly.plugins</groupId>
-				<artifactId>wildfly-maven-plugin</artifactId>
-				<version>${version.wildfly.maven.plugin}</version>
-				<configuration>
-					<skip>false</skip>
-					<filename>${project.build.finalName}.jar</filename>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-ejb-plugin</artifactId>
-				<version>${version.ejb.plugin}</version>
-				<configuration>
-					<ejbVersion>3.1</ejbVersion>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>at.itbh.bev</groupId>
+    <artifactId>bev-search-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>bev-search-api</artifactId>
+  <packaging>ejb</packaging>
+  <name>bev-search-api</name>
+  <description>Public BEV data search API</description>
+  <url>https://github.com/itbh-at/bev-search</url>
+
+  <organization>
+    <name>ITBH - DI Christoph Hermann</name>
+    <url>http://www.itbh.at/</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>cdh</id>
+      <name>Christoph D. Hermann</name>
+      <email>christoph.hermann@itbh.at</email>
+      <organization>ITBH - DI Christoph Hermann</organization>
+      <organizationUrl>http://www.itbh.at/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Vienna</timezone>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>GNU Affero General Public License, Version 3.0</name>
+      <distribution>manual</distribution>
+      <url>http://www.gnu.org/licenses/agpl-3.0.en.html</url>
+    </license>
+  </licenses>
+
+  <dependencies>
+
+    <!--
+        First declare the APIs we depend on and need for
+        compilation. All of them are provided by Wildfly
+    -->
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-spec-api</artifactId>
+      <version>10.0.0.Final</version>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jackson2-provider</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-multipart-provider</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-envers</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
+        Dependencies not provided by Wildfly
+    -->
+
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-core</artifactId>
+      <version>1.9.8.Final</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <!-- Set the name of the deployment -->
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+	<groupId>org.wildfly.plugins</groupId>
+	<artifactId>wildfly-maven-plugin</artifactId>
+	<version>${version.wildfly.maven.plugin}</version>
+	<configuration>
+	  <skip>false</skip>
+	  <filename>${project.build.finalName}.jar</filename>
+	</configuration>
+      </plugin>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-ejb-plugin</artifactId>
+	<version>${version.ejb.plugin}</version>
+	<configuration>
+	  <ejbVersion>3.1</ejbVersion>
+	</configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
