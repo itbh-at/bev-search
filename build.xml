@@ -72,9 +72,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <antcall target="run-pub">
       <param name="p_basedir" value="client${file.separator}web${file.separator}polymer_dart" />
     </antcall>
-    <copydir src="client${file.separator}web${file.separator}polymer_dart${file.separator}build${file.separator}web${file.separator}"
-             dest="server${file.separator}bev-search-ui${file.separator}src${file.separator}main${file.separator}webapp${file.separator}"
-             />
+    <copy todir="server${file.separator}bev-search-ui${file.separator}src${file.separator}main${file.separator}webapp${file.separator}">
+      <fileset dir="client${file.separator}web${file.separator}polymer_dart${file.separator}build${file.separator}web${file.separator}" />
+    </copy>
   </target>
 
   <target name="build-web-angular-client">
@@ -83,11 +83,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </antcall>
   </target>
 
-  <target name="build">
-    <antcall target="build-cmd-java-client" />
+  <target name="clean">
+    <delete>
+      <fileset dir="client${file.separator}web${file.separator}polymer_dart${file.separator}build${file.separator}" />
+    </delete>
+    <delete>
+      <fileset dir="server${file.separator}bev-search-ui${file.separator}src${file.separator}main${file.separator}webapp${file.separator}" />
+    </delete>
+  </target>
+
+  <target name="build" depends="clean">
     <!--
         Build the server and package the web UI into it.
     -->
     <antcall target="build-server" />
+
+    <!--
+        Build the command line client.
+    -->
+    <antcall target="build-cmd-java-client" />
   </target>
 </project>
