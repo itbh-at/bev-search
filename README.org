@@ -1,0 +1,18 @@
+#+TITLE: BEV search
+#+AUTHOR: Christoph D. Hermann <christoph.hermann@itbh.at>
+#+DATE: <2017-04-30 So>
+
+A client-server system for fuzzy searching the publicly available
+address data of the /Bundesamt für Eich- und Vermessungswesen/. The data
+can be downloaded from http://www.bev.gv.at/ > /Unentgeltliche Produkte/
+> /Adressregister[fn:1]./
+
+For detailed usage and installation instructions please refer to the
+documentation in the =doc= folder. The documentation is available only
+in German.
+
+At the moment the only available UI language is German.
+
+* Footnotes
+
+[fn:1] http://www.bev.gv.at/portal/page?_pageid=713,2601271&_dad=portal&_schema=PORTAL
