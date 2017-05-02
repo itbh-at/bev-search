@@ -84,10 +84,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </target>
 
   <target name="clean">
-    <delete>
+    <delete failonerror="false">
       <fileset dir="client${file.separator}web${file.separator}polymer_dart${file.separator}build${file.separator}" />
     </delete>
-    <delete>
+    <delete failonerror="false">
       <fileset dir="server${file.separator}bev-search-ui${file.separator}src${file.separator}main${file.separator}webapp${file.separator}" />
     </delete>
   </target>
