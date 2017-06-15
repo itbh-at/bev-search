@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   <artifactId>bev-search-java-client</artifactId>
   <groupId>at.itbh.bev</groupId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>bev-search-java-client</name>
   <description>Command line ReST client for the BEV search</description>
   <url>https://github.com/itbh-at/bev-search</url>
@@ -51,9 +51,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </developers>
 
   <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- maven-compiler-plugin -->
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.7</maven.compiler.source>
   </properties>
 
   <dependencies>
@@ -81,7 +82,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <artifactId>jackson-databind</artifactId>
       <version>2.7.3</version>
     </dependency>
-
+    
+    <dependency>
+      <groupId>net.sf.supercsv</groupId>
+      <artifactId>super-csv</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    
   </dependencies>
 
   <build>
@@ -110,7 +117,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </configuration>
           </execution>
         </executions>
-      </plugin>    
+      </plugin>   
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <!-- here the phase you need -->
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/examples</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>${basedir}/target</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                  	<include>BevRestClient.jar</include>
+                  </includes>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin> 
     </plugins>
   </build>
 </project>

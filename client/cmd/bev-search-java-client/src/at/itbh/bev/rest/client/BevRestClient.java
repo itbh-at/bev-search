@@ -19,14 +19,22 @@
 
 package at.itbh.bev.rest.client;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
+import java.io.OutputStreamWriter;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -35,16 +43,18 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.supercsv.io.CsvMapWriter;
+import org.supercsv.io.ICsvMapWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class BevRestClient {
+public final class BevRestClient {
 
 	private Options options;
 	private Client client = ClientBuilder.newBuilder().build();
 	private CommandLineParser parser = new DefaultParser();
+	private ICsvMapWriter csvWriter = null;
 
 	public BevRestClient() {
 		this.options = buildOptions();
@@ -53,58 +63,189 @@ public class BevRestClient {
 	private Options buildOptions() {
 		Options options = new Options();
 
+		options.addOption(Option.builder("b").longOpt("batch")
+				.desc("Batch processes the file containing addresses. "
+						+ "Each input line is written to stdout and the matching address is appended if the match is unique. "
+						+ "A column is appendend which contains `true` if the matching address differs significantly form the input. "
+						+ "The order of addresses may not be preserved.")
+				.hasArg().build());
+		options.addOption(Option.builder("t").longOpt("threads")
+				.desc("The max. number of parallel requests to the ReST endpoint. This defaults to 10.").hasArg()
+				.build());
 		options.addOption(Option.builder("z").longOpt("postal-code").desc("postal code").hasArg().build());
 		options.addOption(Option.builder("p").longOpt("place").desc("place or municipaliy").hasArg().build());
 		options.addOption(Option.builder("a").longOpt("address-line").desc("street or building name").hasArg().build());
 		options.addOption(Option.builder("i").longOpt("house-id")
 				.desc("house id (e.g. 1/2 or 1 Obj. 7) or building name").hasArg().build());
-		options.addOption(
-				Option.builder("u").longOpt("unique-only").desc("print only unique results").build());
+		options.addOption(Option.builder("u").longOpt("unique-only").desc("print only unique results").build());
 		options.addOption(Option.builder("s").longOpt("separator").desc("the default field separator is the semi colon")
 				.hasArg().build());
 		options.addOption(Option.builder("r").longOpt("rest-url").desc("URL to the ReST geocoding service").hasArg()
 				.required().argName("URL").build());
 		options.addOption(Option.builder("h").longOpt("help").build());
-		
-		options.addOption(Option.builder().longOpt("radius").hasArg().desc("search radius in km (dot is decimal comma)").build());
-		options.addOption(Option.builder().longOpt("longitude").hasArg().desc("longitude of the search center (dot is decimal comma)").build());
-		options.addOption(Option.builder().longOpt("latitude").hasArg().desc("latitude of the search center (dot is decimal comma)").build());
+
+		options.addOption(
+				Option.builder().longOpt("radius").hasArg().desc("search radius in km (dot is decimal comma)").build());
+		options.addOption(Option.builder().longOpt("longitude").hasArg()
+				.desc("longitude of the search center (dot is decimal comma)").build());
+		options.addOption(Option.builder().longOpt("latitude").hasArg()
+				.desc("latitude of the search center (dot is decimal comma)").build());
+		options.addOption(Option.builder().longOpt("disable-certificate-validation")
+				.desc("disable the SSL certificate validation").build());
 
 		return options;
 	}
 
+	protected void outputResults(String separator, List<BevQueryResult> results) {
+		// TODO use CSVMapWriter
+		for (BevQueryResult result : results) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("\"");
+			sb.append(result.getPostalCode());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getPlace());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getStreet());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getHouseNumber());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getHouseNumberAddition());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getBuildingId());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getAddressName());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getBuildingName());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getMunicipality());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append(result.getLongitude());
+			sb.append(separator);
+			sb.append(result.getLatitude());
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getId());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getAdrcd());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getSubcd());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getSkz());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getOkz());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append("\"");
+			sb.append(result.getGkz());
+			sb.append("\"");
+			sb.append(separator);
+
+			sb.append(result.getWarning());
+			sb.append(separator);
+
+			sb.append(result.getScore());
+			sb.append(separator);
+			sb.append(result.getDistance());
+			sb.append(separator);
+			sb.append(System.getProperty("line.separator"));
+
+			System.out.println(sb.toString());
+		}
+	}
+
+	/**
+	 * Query the ReST endpoint using the command line arguments
+	 * 
+	 * @param args
+	 *            the command line arguments
+	 */
 	public void query(String[] args) {
+		BevQueryExecutor executor = null;
 		try {
 			// parse the command line arguments
 			CommandLine line = parser.parse(options, args);
 
+			int threadPoolSize = 1;
+			if (line.hasOption("t")) {
+				threadPoolSize = Integer.parseInt(line.getOptionValue("t"));
+			}
+
 			WebTarget target = client.target(line.getOptionValue("r"));
-			
+
+			executor = new BevQueryExecutor(target, threadPoolSize);
+
+			String postalCode = null;
+			String place = null;
+			String addressLine = null;
+			String houseId = null;
+			String radius = null;
+			String longitude = null;
+			String latitude = null;
 			String separator = ";";
-			boolean unique = false;
+			boolean enforceUnique = false;
 			if (line.hasOption("z")) {
-				target = target.queryParam("postalCode", line.getOptionValue("z"));
+				postalCode = line.getOptionValue("z");
 			}
 			if (line.hasOption("p")) {
-				target = target.queryParam("place", line.getOptionValue("p"));
+				place = line.getOptionValue("p");
 			}
 			if (line.hasOption("a")) {
-				target = target.queryParam("addressLine", line.getOptionValue("a"));
+				addressLine = line.getOptionValue("a");
 			}
 			if (line.hasOption("i")) {
-				target = target.queryParam("houseId", line.getOptionValue("i"));
+				houseId = line.getOptionValue("i");
+			}
+			if (line.hasOption("radius")) {
+				radius = line.getOptionValue("radius");
+			}
+			if (line.hasOption("longitude")) {
+				longitude = line.getOptionValue("longitude");
+			}
+			if (line.hasOption("latitude")) {
+				latitude = line.getOptionValue("latitude");
 			}
 			if (line.hasOption("s")) {
 				separator = line.getOptionValue("s");
-			}
-			if (line.hasOption("radius")) {
-				target = target.queryParam("radius", line.getOptionValue("radius"));
-			}
-			if (line.hasOption("longitude")) {
-				target = target.queryParam("longitude", line.getOptionValue("longitude"));
-			}
-			if (line.hasOption("latitude")) {
-				target = target.queryParam("latitude", line.getOptionValue("latitude"));
 			}
 			if (line.hasOption("h")) {
 				HelpFormatter formatter = new HelpFormatter();
@@ -112,148 +253,77 @@ public class BevRestClient {
 				System.exit(0);
 			}
 			if (line.hasOption("u")) {
-				unique = true;
+				enforceUnique = true;
 			}
-			
-			// Build a HTTP GET request that accepts "text/plain" response type
-			// and contains a custom HTTP header entry "Foo: bar".
-			Invocation invocation = target.request(MediaType.APPLICATION_JSON).buildGet();
 
-			// Invoke the request using generic interface
-			String response = invocation.invoke(String.class);
+			if (line.hasOption("disable-certificate-validation")) {
+				// Create a trust manager that does not validate certificate
+				// chains
+				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return new X509Certificate[0];
+					}
 
-			ObjectMapper objectMapper = new ObjectMapper();
-			JsonNode root = objectMapper.readTree(response);
+					public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+					}
 
-			String type = root.at("/status/responseType").asText();
+					public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+					}
+				} };
 
-			if (!type.equals("at.itbh.bev.api.data.AustrianCommonQueryResult")) {
-				throw new Exception(
-						"Only response type 'at.itbh.bev.api.data.AustrianCommonQueryResult' is supported.");
+				// Install the all-trusting trust manager
+				SSLContext sc = SSLContext.getInstance("SSL");
+				sc.init(null, trustAllCerts, new java.security.SecureRandom());
+				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 			}
-			
-			Integer code = root.at("/status/code").asInt();
-			if (code > 0) {
-				String message = root.at("/status/message").asText();
-				System.err.println(message);
-				System.exit(code);
-			}
-			
-			StringBuilder sb = new StringBuilder();			
-			Iterator<JsonNode> iter = root.at("/response").elements();
-			int i = 0;
-			while (iter.hasNext()) {
-				JsonNode node = iter.next();
-				sb.append("\"");
-				sb.append(node.at("/address/postalCode").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/place").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/street").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/houseNumber").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/houseNumberAddition").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/buildingId").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/addressName").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/buildingName").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/municipality").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append(node.at("/address/longitude").asText(""));
-				sb.append(separator);
-				sb.append(node.at("/address/latitude").asText(""));
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/id").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/adrcd").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/subcd").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/skz").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/okz").asText(""));
-				sb.append("\"");
-				sb.append(separator);
-				
-				sb.append("\"");
-				sb.append(node.at("/address/gkz").asText(""));
-				sb.append("\"");
-				sb.append(separator);
 
-				sb.append(node.at("/score").asText(""));
-				sb.append(separator);
-				sb.append(node.at("/distance").asText(""));
-				sb.append(separator);
-				sb.append(System.getProperty("line.separator"));
-				i++;
+			CsvPreference csvPreference = new CsvPreference.Builder('"',
+					Objects.toString(line.getOptionValue("s"), ";").toCharArray()[0],
+					System.getProperty("line.separator")).build();
+			csvWriter = new CsvMapWriter(new OutputStreamWriter(System.out), csvPreference, true);
+
+			if (line.hasOption("b")) {
+
+			} else {
+				Future<List<BevQueryResult>> queryResult = executor.query(postalCode, place, addressLine, houseId,
+						longitude, latitude, radius, enforceUnique);
+				try {
+					List<BevQueryResult> results = queryResult.get();
+
+					if (enforceUnique && results.size() == 1) {
+						if (!results.get(0).getFoundMatch())
+							throw new Exception("No unique result found.");
+					}
+
+					outputResults(separator, results);
+				} catch (ExecutionException e) {
+					throw e.getCause();
+				}
 			}
-			
-			if (unique && i > 1) {
-				System.exit(-5);
-			}
-			System.out.println(sb.toString());
-		} 
-		catch (ParseException exp) {
+		} catch (ParseException exp) {
 			System.out.println(exp.getMessage());
 			System.out.println();
 			// automatically generate the help statement
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java -jar BevRestClient.jar", options, true);
 			System.exit(-2);
+		} catch (BevRestException e) {
+			System.err.println(e.toString());
+			System.exit(e.getErrorCode());
 		} catch (JsonProcessingException e) {
 			System.err.println(e.toString());
 			System.exit(-3);
 		} catch (IOException e) {
 			System.err.println(e.toString());
 			System.exit(-4);
-		} catch (Exception e) {
-			System.err.println(e.toString());
-			e.printStackTrace();
+		} catch (Throwable t) {
+			System.err.println(t.toString());
+			t.printStackTrace();
 			System.exit(-1);
+		} finally {
+			if (executor != null) {
+				executor.dispose();
+			}
 		}
 	}
 
