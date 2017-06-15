@@ -9,7 +9,9 @@ echo
 echo -n "Path prefix: "
 read path_prefix
 
-BEV_REST_CLIENT=BevRestClient.jar
+BASEDIR=$(dirname "$0")
+echo "$BASEDIR"
+BEV_REST_CLIENT=$BASEDIR/BevRestClient.jar
 
 # Print and run command
 function run_command {
