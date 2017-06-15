@@ -256,18 +256,20 @@ public final class BevRestClient {
 			if (line.hasOption("u")) {
 				enforceUnique = true;
 			}
-
+			
 			if (line.hasOption("disable-certificate-validation")) {
 				clientBuilder.disableTrustManager();
 			}
-			if (line.hasOption("proxyHost")) {
-				clientBuilder.defaultProxy(line.getOptionValue("proxyHost"));
+			
+			if (!line.hasOption("proxyPort") && line.hasOption("proxyHost")) {
+				throw new ParseException(
+						"The option proxyHost is only allowed in combination with the option proxyPort.");
 			}
 			if (line.hasOption("proxyPort") && !line.hasOption("proxyHost")) {
 				throw new ParseException(
 						"The option proxyPort is only allowed in combination with the option proxyHost.");
 			}
-			if (line.hasOption("proxyPort")) {
+			 if (line.hasOption("proxyHost") && line.hasOption("proxyPort")) {
 				clientBuilder.defaultProxy(line.getOptionValue("proxyHost"),
 						Integer.parseInt(line.getOptionValue("proxyPort")));
 			}
