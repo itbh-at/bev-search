@@ -41,8 +41,10 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -52,7 +54,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public final class BevRestClient {
 
 	private Options options;
-	private Client client = ClientBuilder.newBuilder().build();
+	private Client client;
 	private CommandLineParser parser = new DefaultParser();
 	private ICsvMapWriter csvWriter = null;
 
@@ -92,6 +94,8 @@ public final class BevRestClient {
 				.desc("latitude of the search center (dot is decimal comma)").build());
 		options.addOption(Option.builder().longOpt("disable-certificate-validation")
 				.desc("disable the SSL certificate validation").build());
+		options.addOption(Option.builder().longOpt("proxyHost").hasArg().desc("the proxy host").build());
+		options.addOption(Option.builder().longOpt("proxyPort").hasArg().desc("the proxy port. Only valid in combination with proxyHost").build());
 
 		return options;
 	}
@@ -201,6 +205,7 @@ public final class BevRestClient {
 	 */
 	public void query(String[] args) {
 		BevQueryExecutor executor = null;
+		ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder();
 		try {
 			// parse the command line arguments
 			CommandLine line = parser.parse(options, args);
@@ -209,10 +214,6 @@ public final class BevRestClient {
 			if (line.hasOption("t")) {
 				threadPoolSize = Integer.parseInt(line.getOptionValue("t"));
 			}
-
-			WebTarget target = client.target(line.getOptionValue("r"));
-
-			executor = new BevQueryExecutor(target, threadPoolSize);
 
 			String postalCode = null;
 			String place = null;
@@ -257,26 +258,24 @@ public final class BevRestClient {
 			}
 
 			if (line.hasOption("disable-certificate-validation")) {
-				// Create a trust manager that does not validate certificate
-				// chains
-				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-						return new X509Certificate[0];
-					}
-
-					public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-					}
-
-					public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-					}
-				} };
-
-				// Install the all-trusting trust manager
-				SSLContext sc = SSLContext.getInstance("SSL");
-				sc.init(null, trustAllCerts, new java.security.SecureRandom());
-				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+				clientBuilder.disableTrustManager();
 			}
-
+			if (line.hasOption("proxyHost")) {
+				clientBuilder.defaultProxy(line.getOptionValue("proxyHost"));
+			}
+			if (line.hasOption("proxyPort") && !line.hasOption("proxyHost")) {
+				throw new ParseException(
+						"The option proxyPort is only allowed in combination with the option proxyHost.");
+			}
+			if (line.hasOption("proxyPort")) {
+				clientBuilder.defaultProxy(line.getOptionValue("proxyHost"),
+						Integer.parseInt(line.getOptionValue("proxyPort")));
+			}
+			
+			client = clientBuilder.build();
+			WebTarget target = client.target(line.getOptionValue("r"));
+			executor = new BevQueryExecutor(target, threadPoolSize);
+			
 			CsvPreference csvPreference = new CsvPreference.Builder('"',
 					Objects.toString(line.getOptionValue("s"), ";").toCharArray()[0],
 					System.getProperty("line.separator")).build();
