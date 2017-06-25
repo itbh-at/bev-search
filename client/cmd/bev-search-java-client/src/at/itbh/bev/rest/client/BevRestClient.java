@@ -19,6 +19,7 @@
 
 package at.itbh.bev.rest.client;
 
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -179,7 +180,6 @@ public final class BevRestClient {
 	private CommandLineParser parser = new DefaultParser();
 	private ICsvMapWriter csvWriter = null;
 
-	
 	/**
 	 * Fields contained in every output
 	 */
@@ -227,9 +227,11 @@ public final class BevRestClient {
 				.desc("latitude of the search center (dot is decimal comma)").build());
 		options.addOption(Option.builder().longOpt("disable-certificate-validation")
 				.desc("disable the SSL certificate validation").build());
-		options.addOption(Option.builder().longOpt("proxyHost").hasArg().desc("the proxy host").build());
-		options.addOption(Option.builder().longOpt("proxyPort").hasArg()
-				.desc("the proxy port. Only valid in combination with proxyHost").build());
+		options.addOption(Option.builder().longOpt("proxy-host").hasArg().desc("the proxy host").build());
+		options.addOption(Option.builder().longOpt("proxy-port").hasArg()
+				.desc("the proxy port. Only valid in combination with --proxy-host").build());
+		options.addOption(Option.builder("o").longOpt("output").hasArg()
+				.desc("The output is written to this file. The output defaults to the standard output.").build());
 
 		return options;
 	}
@@ -241,8 +243,7 @@ public final class BevRestClient {
 	 * @param results
 	 * @throws IOException
 	 */
-	protected void outputResults(String separator, List<BevQueryResult> results)
-			throws IOException {
+	protected void outputResults(String separator, List<BevQueryResult> results) throws IOException {
 		Map<String, Object> fieldValues = new HashMap<>();
 		for (BevQueryResult result : results) {
 			fieldValues.put(_POSTAL_CODE, result.getPostalCode());
@@ -341,17 +342,24 @@ public final class BevRestClient {
 				clientBuilder.disableTrustManager();
 			}
 
-			if (!line.hasOption("proxyPort") && line.hasOption("proxyHost")) {
+			if (!line.hasOption("proxy-port") && line.hasOption("proxy-host")) {
 				throw new ParseException(
-						"The option proxyHost is only allowed in combination with the option proxyPort.");
+						"The option --proxy-host is only allowed in combination with the option --proxy-port.");
 			}
-			if (line.hasOption("proxyPort") && !line.hasOption("proxyHost")) {
+			if (line.hasOption("proxy-port") && !line.hasOption("proxy-host")) {
 				throw new ParseException(
-						"The option proxyPort is only allowed in combination with the option proxyHost.");
+						"The option --proxy-port is only allowed in combination with the option --proxy-host.");
 			}
-			if (line.hasOption("proxyHost") && line.hasOption("proxyPort")) {
-				clientBuilder.defaultProxy(line.getOptionValue("proxyHost"),
-						Integer.parseInt(line.getOptionValue("proxyPort")));
+			if (line.hasOption("proxy-host") && line.hasOption("proxy-port")) {
+				clientBuilder.defaultProxy(line.getOptionValue("proxy-host"),
+						Integer.parseInt(line.getOptionValue("proxy-port")));
+			}
+
+			OutputStreamWriter output;
+			if (line.hasOption("o")) {
+				output = new OutputStreamWriter(new FileOutputStream(line.getOptionValue("o")));
+			} else {
+				output = new OutputStreamWriter(System.out);
 			}
 
 			// avoid concurrent access exceptions in the Apache http client
@@ -361,7 +369,7 @@ public final class BevRestClient {
 			CsvPreference csvPreference = new CsvPreference.Builder('"',
 					Objects.toString(line.getOptionValue("s"), ";").toCharArray()[0],
 					System.getProperty("line.separator")).build();
-			csvWriter = new CsvMapWriter(new OutputStreamWriter(System.out), csvPreference, true);
+			csvWriter = new CsvMapWriter(output, csvPreference, true);
 
 			if (line.hasOption("b")) {
 				ICsvMapReader mapReader = null;
