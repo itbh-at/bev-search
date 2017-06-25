@@ -101,4 +101,4 @@ echo
 
 check_proceed
 
-run_command "java -jar ${BEV_REST_CLIENT} -r ${path_prefix}/bev-search-rest/v1/at/common/geocode -a Ortweinstraße -i 15 -z 3100 -p 'St. Pölten'"
+run_command "java -jar ${BEV_REST_CLIENT} -r ${path_prefix}/bev-search-rest/v1/at/common/geocode -a Ortweinstraße -i 15 -z 3100 -p 'St. Pölten' -u"

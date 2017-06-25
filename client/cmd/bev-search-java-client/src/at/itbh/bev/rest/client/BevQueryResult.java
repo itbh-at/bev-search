@@ -1,5 +1,7 @@
 package at.itbh.bev.rest.client;
 
+import java.util.Map;
+
 public class BevQueryResult {
 
 	private String postalCode;
@@ -22,7 +24,20 @@ public class BevQueryResult {
 	private double score;
 	private String distance;
 	private boolean warning = false;
-	private boolean foundMatch = true;
+	private boolean foundMatch = false;
+	
+	/**
+	 * Original input data to be available in a later processing phase
+	 */
+	private Map<String, String> inputData;
+
+	public Map<String, String> getInputData() {
+		return inputData;
+	}
+
+	public void setInputData(Map<String, String> inputData) {
+		this.inputData = inputData;
+	}
 
 	public String getPostalCode() {
 		return postalCode;
@@ -204,6 +219,16 @@ public class BevQueryResult {
 	
 	void setFoundMatch(boolean foundMatch) {
 		this.foundMatch = foundMatch;
+	}
+
+	@Override
+	public String toString() {
+		return "BevQueryResult [postalCode=" + postalCode + ", place=" + place + ", street=" + street + ", houseNumber="
+				+ houseNumber + ", houseNumberAddition=" + houseNumberAddition + ", buildingId=" + buildingId
+				+ ", addressName=" + addressName + ", buildingName=" + buildingName + ", municipality=" + municipality
+				+ ", longitude=" + longitude + ", latitude=" + latitude + ", id=" + id + ", adrcd=" + adrcd + ", subcd="
+				+ subcd + ", skz=" + skz + ", okz=" + okz + ", gkz=" + gkz + ", score=" + score + ", distance="
+				+ distance + ", warning=" + warning + ", foundMatch=" + foundMatch + ", inputData=" + inputData + "]";
 	}
 
 }

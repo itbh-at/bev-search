@@ -3,11 +3,14 @@ package at.itbh.bev.rest.client;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -21,9 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class BevQueryExecutor {
 
 	private final ExecutorService fixedThreadPool;
-	private WebTarget restEndpoint;
+	private String restEndpoint;
+	private Client client;
 
-	public BevQueryExecutor(WebTarget restEndpoint, int numThreads) {
+	public BevQueryExecutor(Client client, String restEndpoint, int numThreads) {
+		this.client = client;
 		this.restEndpoint = restEndpoint;
 		this.fixedThreadPool = Executors.newFixedThreadPool(numThreads);
 	}
@@ -51,38 +56,56 @@ public class BevQueryExecutor {
 	 *            If <code>true</code> the result object is added only to the
 	 *            result list if it is unique. Otherwise the empty list is
 	 *            returned.
+	 * @param inputData
+	 *            must not be <code>null<code>. All query parameters and
+	 *            additional input fields to be passed through to the
+	 *            {@link BevQueryResult} in
+	 *            {@link BevQueryResult#getInputData()} as key-value pairs.
 	 */
-	public Future<List<BevQueryResult>> query(final String postalCode, final String place, final String addressLine, final String houseId,
-			final String longitude, final String latitude, final String radius, final boolean enforceUnique) {
+	public Future<List<BevQueryResult>> query(final String postalCode, final String place, final String addressLine,
+			final String houseId, final String longitude, final String latitude, final String radius,
+			final boolean enforceUnique, Map<String, String> inputData) {
+
+		inputData.put(BevRestClient.INPUT_POSTAL_CODE, postalCode);
+		inputData.put(BevRestClient.INPUT_PLACE, place);
+		inputData.put(BevRestClient.INPUT_ADDRESS_LINE, addressLine);
+		inputData.put(BevRestClient.INPUT_HOUSE_ID, houseId);
+		inputData.put(BevRestClient.INPUT_LONGITUDE, longitude);
+		inputData.put(BevRestClient.INPUT_LATITUDE, latitude);
+		inputData.put(BevRestClient.INPUT_RADIUS, radius);
+		inputData.put(BevRestClient.INPUT_ENFORCE_UNIQUE, Objects.toString(enforceUnique));
+
 		// Create asynchronous request
 		Callable<List<BevQueryResult>> request = new Callable<List<BevQueryResult>>() {
 			@Override
 			public List<BevQueryResult> call() throws Exception {
+				WebTarget target = client.target(restEndpoint);
+
 				if (postalCode != null) {
-					restEndpoint = restEndpoint.queryParam("postalCode", postalCode);
+					target = target.queryParam("postalCode", postalCode);
 				}
 				if (place != null) {
-					restEndpoint = restEndpoint.queryParam("place", place);
+					target = target.queryParam("place", place);
 				}
 				if (addressLine != null) {
-					restEndpoint = restEndpoint.queryParam("addressLine", addressLine);
+					target = target.queryParam("addressLine", addressLine);
 				}
 				if (houseId != null) {
-					restEndpoint = restEndpoint.queryParam("houseId", houseId);
+					target = target.queryParam("houseId", houseId);
 				}
 				if (radius != null) {
-					restEndpoint = restEndpoint.queryParam("radius", radius);
+					target = target.queryParam("radius", radius);
 				}
 				if (longitude != null) {
-					restEndpoint = restEndpoint.queryParam("longitude", longitude);
+					target = target.queryParam("longitude", longitude);
 				}
 				if (latitude != null) {
-					restEndpoint = restEndpoint.queryParam("latitude", latitude);
+					target = target.queryParam("latitude", latitude);
 				}
 
 				// Build a HTTP GET request
-				Invocation invocation = restEndpoint.request(MediaType.APPLICATION_JSON).buildGet();
-				
+				Invocation invocation = target.request(MediaType.APPLICATION_JSON).buildGet();
+
 				// Invoke the request using the generic interface
 				String response = invocation.invoke(String.class);
 
@@ -99,7 +122,11 @@ public class BevQueryExecutor {
 				Integer code = root.at("/status/code").asInt();
 				if (code > 0) {
 					String message = root.at("/status/message").asText();
-					throw new BevRestException(code, message);
+					// don't throw an exception if the query is considered being
+					// empty
+					if (!message.contains("org.hibernate.search.exception.EmptyQueryException")) {
+						throw new BevRestException(code, message);
+					}
 				}
 
 				Iterator<JsonNode> iter = root.at("/response").elements();
@@ -114,6 +141,7 @@ public class BevQueryExecutor {
 						results.clear();
 						BevQueryResult tempResult = new BevQueryResult();
 						tempResult.setFoundMatch(false);
+						tempResult.setInputData(inputData);
 						results.add(tempResult);
 						return results;
 					}
@@ -141,6 +169,9 @@ public class BevQueryExecutor {
 					bqr.setScore(node.at("/score").asDouble());
 					bqr.setDistance(node.at("/distance").asText(""));
 					bqr.setWarning(node.at("/warning").asBoolean(false));
+					bqr.setFoundMatch(true);
+
+					bqr.setInputData(inputData);
 
 					results.add(bqr);
 					i++;

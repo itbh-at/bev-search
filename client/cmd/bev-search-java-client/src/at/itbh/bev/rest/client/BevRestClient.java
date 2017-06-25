@@ -19,33 +19,29 @@
 
 package at.itbh.bev.rest.client;
 
-import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.supercsv.io.CsvMapReader;
 import org.supercsv.io.CsvMapWriter;
+import org.supercsv.io.ICsvMapReader;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
@@ -53,10 +49,149 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 public final class BevRestClient {
 
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_POSTAL_CODE = "postalCode";
+
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_PLACE = "place";
+
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_ADDRESS_LINE = "addressLine";
+
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_HOUSE_ID = "houseId";
+
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_LONGITUDE = "longitude";
+
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_LATITUDE = "latitude";
+
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_RADIUS = "radius";
+
+	/**
+	 * Input field name
+	 */
+	public static final String INPUT_ENFORCE_UNIQUE = "enforceUnique";
+
+	/**
+	 * Query result field name
+	 */
+	private static final String _FOUND_MATCH = "_foundMatch";
+
+	/**
+	 * Query result field name
+	 */
+	private static final String _DISTANCE = "_distance";
+	/**
+	 * Query result field name
+	 */
+	private static final String _SCORE = "_score";
+	/**
+	 * Query result field name
+	 */
+	private static final String _WARNING = "_warning";
+	/**
+	 * Query result field name
+	 */
+	private static final String _GKZ = "_gkz";
+	/**
+	 * Query result field name
+	 */
+	private static final String _OKZ = "_okz";
+	/**
+	 * Query result field name
+	 */
+	private static final String _SKZ = "_skz";
+	/**
+	 * Query result field name
+	 */
+	private static final String _SUBCD = "_subcd";
+	/**
+	 * Query result field name
+	 */
+	private static final String _ADRCD = "_adrcd";
+	/**
+	 * Query result field name
+	 */
+	private static final String _ID = "_id";
+	/**
+	 * Query result field name
+	 */
+	private static final String _LATITUDE = "_latitude";
+	/**
+	 * Query result field name
+	 */
+	private static final String _LONGITUDE = "_longitude";
+	/**
+	 * Query result field name
+	 */
+	private static final String _MUNICIPALITY = "_municipality";
+	/**
+	 * Query result field name
+	 */
+	private static final String _BUILDING_NAME = "_buildingName";
+	/**
+	 * Query result field name
+	 */
+	private static final String _ADDRESS_NAME = "_addressName";
+	/**
+	 * Query result field name
+	 */
+	private static final String _BUILDING_ID = "_buildingId";
+	/**
+	 * Query result field name
+	 */
+	private static final String _HOUSE_NUMBER_ADDITION = "_houseNumberAddition";
+	/**
+	 * Query result field name
+	 */
+	private static final String _HOUSE_NUMBER = "_houseNumber";
+	/**
+	 * Query result field name
+	 */
+	private static final String _STREET = "_street";
+	/**
+	 * Query result field name
+	 */
+	private static final String _PLACE = "_place";
+	/**
+	 * Query result field name
+	 */
+	protected static final String _POSTAL_CODE = "_postalCode";
+
 	private Options options;
-	private Client client;
 	private CommandLineParser parser = new DefaultParser();
 	private ICsvMapWriter csvWriter = null;
+
+	
+	/**
+	 * Fields contained in every output
+	 */
+	private final String[] defaultFieldNames = new String[] { INPUT_POSTAL_CODE, INPUT_PLACE, INPUT_ADDRESS_LINE,
+			INPUT_HOUSE_ID, INPUT_LONGITUDE, INPUT_LATITUDE, INPUT_RADIUS, INPUT_ENFORCE_UNIQUE, _POSTAL_CODE, _PLACE,
+			_STREET, _HOUSE_NUMBER, _HOUSE_NUMBER_ADDITION, _BUILDING_ID, _ADDRESS_NAME, _BUILDING_NAME, _MUNICIPALITY,
+			_LONGITUDE, _LATITUDE, _ID, _ADRCD, _SUBCD, _SKZ, _OKZ, _GKZ, _WARNING, _SCORE, _DISTANCE, _FOUND_MATCH };
+
+	/**
+	 * Default fields and additional input fields
+	 */
+	private String[] fieldNames;
 
 	public BevRestClient() {
 		this.options = buildOptions();
@@ -66,13 +201,11 @@ public final class BevRestClient {
 		Options options = new Options();
 
 		options.addOption(Option.builder("b").longOpt("batch")
-				.desc("Batch processes the file containing addresses. "
-						+ "Each input line is written to stdout and the matching address is appended if the match is unique. "
-						+ "A column is appendend which contains `true` if the matching address differs significantly form the input. "
+				.desc("Batch processes the file line by line where each line represents an address. "
 						+ "The order of addresses may not be preserved.")
 				.hasArg().build());
 		options.addOption(Option.builder("t").longOpt("threads")
-				.desc("The max. number of parallel requests to the ReST endpoint. This defaults to 10.").hasArg()
+				.desc("The max. number of parallel requests to the ReST endpoint. This defaults to 1.").hasArg()
 				.build());
 		options.addOption(Option.builder("z").longOpt("postal-code").desc("postal code").hasArg().build());
 		options.addOption(Option.builder("p").longOpt("place").desc("place or municipaliy").hasArg().build());
@@ -95,105 +228,52 @@ public final class BevRestClient {
 		options.addOption(Option.builder().longOpt("disable-certificate-validation")
 				.desc("disable the SSL certificate validation").build());
 		options.addOption(Option.builder().longOpt("proxyHost").hasArg().desc("the proxy host").build());
-		options.addOption(Option.builder().longOpt("proxyPort").hasArg().desc("the proxy port. Only valid in combination with proxyHost").build());
+		options.addOption(Option.builder().longOpt("proxyPort").hasArg()
+				.desc("the proxy port. Only valid in combination with proxyHost").build());
 
 		return options;
 	}
 
-	protected void outputResults(String separator, List<BevQueryResult> results) {
-		// TODO use CSVMapWriter
+	/**
+	 * Output the query result to the command line
+	 * 
+	 * @param separator
+	 * @param results
+	 * @throws IOException
+	 */
+	protected void outputResults(String separator, List<BevQueryResult> results)
+			throws IOException {
+		Map<String, Object> fieldValues = new HashMap<>();
 		for (BevQueryResult result : results) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("\"");
-			sb.append(result.getPostalCode());
-			sb.append("\"");
-			sb.append(separator);
+			fieldValues.put(_POSTAL_CODE, result.getPostalCode());
+			fieldValues.put(_PLACE, result.getPlace());
+			fieldValues.put(_STREET, result.getStreet());
+			fieldValues.put(_HOUSE_NUMBER, result.getHouseNumber());
+			fieldValues.put(_HOUSE_NUMBER_ADDITION, result.getHouseNumberAddition());
+			fieldValues.put(_BUILDING_ID, result.getBuildingId());
+			fieldValues.put(_ADDRESS_NAME, result.getAddressName());
+			fieldValues.put(_BUILDING_NAME, result.getBuildingName());
+			fieldValues.put(_MUNICIPALITY, result.getMunicipality());
+			fieldValues.put(_LONGITUDE, result.getLongitude());
+			fieldValues.put(_LATITUDE, result.getLatitude());
+			fieldValues.put(_ID, result.getId());
+			fieldValues.put(_ADRCD, result.getAdrcd());
+			fieldValues.put(_SUBCD, result.getSubcd());
+			fieldValues.put(_SKZ, result.getSkz());
+			fieldValues.put(_OKZ, result.getOkz());
+			fieldValues.put(_GKZ, result.getGkz());
+			fieldValues.put(_WARNING, result.getWarning());
+			fieldValues.put(_SCORE, result.getScore());
+			fieldValues.put(_DISTANCE, result.getDistance());
+			fieldValues.put(_FOUND_MATCH, result.getFoundMatch());
 
-			sb.append("\"");
-			sb.append(result.getPlace());
-			sb.append("\"");
-			sb.append(separator);
+			for (int i = 0; i < fieldNames.length; i++) {
+				if (fieldValues.containsKey(fieldNames[i]))
+					continue;
+				fieldValues.put(fieldNames[i], result.getInputData().get(fieldNames[i]));
+			}
 
-			sb.append("\"");
-			sb.append(result.getStreet());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getHouseNumber());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getHouseNumberAddition());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getBuildingId());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getAddressName());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getBuildingName());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getMunicipality());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append(result.getLongitude());
-			sb.append(separator);
-			sb.append(result.getLatitude());
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getId());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getAdrcd());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getSubcd());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getSkz());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getOkz());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append("\"");
-			sb.append(result.getGkz());
-			sb.append("\"");
-			sb.append(separator);
-
-			sb.append(result.getWarning());
-			sb.append(separator);
-
-			sb.append(result.getScore());
-			sb.append(separator);
-			sb.append(result.getDistance());
-			sb.append(separator);
-			sb.append(System.getProperty("line.separator"));
-
-			System.out.println(sb.toString());
+			csvWriter.write(fieldValues, fieldNames);
 		}
 	}
 
@@ -256,11 +336,11 @@ public final class BevRestClient {
 			if (line.hasOption("u")) {
 				enforceUnique = true;
 			}
-			
+
 			if (line.hasOption("disable-certificate-validation")) {
 				clientBuilder.disableTrustManager();
 			}
-			
+
 			if (!line.hasOption("proxyPort") && line.hasOption("proxyHost")) {
 				throw new ParseException(
 						"The option proxyHost is only allowed in combination with the option proxyPort.");
@@ -269,33 +349,69 @@ public final class BevRestClient {
 				throw new ParseException(
 						"The option proxyPort is only allowed in combination with the option proxyHost.");
 			}
-			 if (line.hasOption("proxyHost") && line.hasOption("proxyPort")) {
+			if (line.hasOption("proxyHost") && line.hasOption("proxyPort")) {
 				clientBuilder.defaultProxy(line.getOptionValue("proxyHost"),
 						Integer.parseInt(line.getOptionValue("proxyPort")));
 			}
-			
-			client = clientBuilder.build();
-			WebTarget target = client.target(line.getOptionValue("r"));
-			executor = new BevQueryExecutor(target, threadPoolSize);
-			
+
+			// avoid concurrent access exceptions in the Apache http client
+			clientBuilder.connectionPoolSize(threadPoolSize);
+			executor = new BevQueryExecutor(clientBuilder.build(), line.getOptionValue("r"), threadPoolSize);
+
 			CsvPreference csvPreference = new CsvPreference.Builder('"',
 					Objects.toString(line.getOptionValue("s"), ";").toCharArray()[0],
 					System.getProperty("line.separator")).build();
 			csvWriter = new CsvMapWriter(new OutputStreamWriter(System.out), csvPreference, true);
 
 			if (line.hasOption("b")) {
+				ICsvMapReader mapReader = null;
+				try {
+					FileReader fileReader = new FileReader(line.getOptionValue("b"));
+					mapReader = new CsvMapReader(fileReader, csvPreference);
 
+					// calculate the output header (field names)
+					final String[] header = mapReader.getHeader(true);
+					ArrayList<String> tempFields = new ArrayList<>(Arrays.asList(defaultFieldNames));
+					for (int i = 0; i < header.length; i++) {
+						if (!tempFields.contains(header[i])) {
+							tempFields.add(header[i]);
+						}
+					}
+					fieldNames = tempFields.toArray(new String[] {});
+
+					Map<String, String> inputData;
+					List<Future<List<BevQueryResult>>> queryResults = new ArrayList<>();
+					while ((inputData = mapReader.read(header)) != null) {
+						queryResults
+								.add(executor.query(inputData.get(INPUT_POSTAL_CODE), inputData.get(INPUT_PLACE),
+										inputData.get(INPUT_ADDRESS_LINE), inputData.get(INPUT_HOUSE_ID),
+										inputData.get(INPUT_LONGITUDE), inputData.get(INPUT_LATITUDE),
+										inputData.get(INPUT_RADIUS),
+										inputData.get(INPUT_ENFORCE_UNIQUE) == null ? false
+												: Boolean.parseBoolean(inputData.get(INPUT_ENFORCE_UNIQUE)),
+										inputData));
+					}
+					csvWriter.writeHeader(fieldNames);
+					for (Future<List<BevQueryResult>> queryResult : queryResults) {
+						List<BevQueryResult> results = queryResult.get();
+						outputResults(separator, results);
+					}
+				} finally {
+					if (mapReader != null) {
+						mapReader.close();
+					}
+				}
 			} else {
+				fieldNames = defaultFieldNames;
+				Map<String, String> inputData = new HashMap<String, String>();
 				Future<List<BevQueryResult>> queryResult = executor.query(postalCode, place, addressLine, houseId,
-						longitude, latitude, radius, enforceUnique);
+						longitude, latitude, radius, enforceUnique, inputData);
 				try {
 					List<BevQueryResult> results = queryResult.get();
-
 					if (enforceUnique && results.size() == 1) {
 						if (!results.get(0).getFoundMatch())
 							throw new Exception("No unique result found.");
 					}
-
 					outputResults(separator, results);
 				} catch (ExecutionException e) {
 					throw e.getCause();
@@ -322,6 +438,14 @@ public final class BevRestClient {
 			t.printStackTrace();
 			System.exit(-1);
 		} finally {
+			if (csvWriter != null) {
+				try {
+					csvWriter.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.exit(-1);
+				}
+			}
 			if (executor != null) {
 				executor.dispose();
 			}
