@@ -1,0 +1,9 @@
+postalCode;place;addressLine;houseId;info;anotherField;enforceUnique
+2344;Maria Enzersdorf;Südstadtzentrum;4;an address;a field;true
+3100;St. Pölten;Ortweinstraße;15;eine Adresse;ein Feld;true
+3100;St. Pölten;Ortweinstraße;;eine Adresse;ein Feld;false
+3100;St. Pölten;Ortweinstraße;16;eine Adresse;ein Feld;false
+3100;St. Pölten;Ortweinstraße;;eine Adresse;ein Feld;true
+abc;test;123;bla;asf;asdf;mh
+2320;Schwechat;Flughafen;;Testadresse;falscher Ort;true
+1300;Mannswörth;Flughafen Wien Schwechat;Obj. 130;Testadresse;richtige Adresse;true
